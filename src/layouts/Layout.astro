@@ -1,0 +1,42 @@
+---
+interface Props {
+  title?: string;
+}
+const { title = 'Eduardo Turriza — OBS/1' } = Astro.props;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+      *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+      :root {
+        --bg: #0a0e1a;
+        --bg2: #0f1526;
+        --bg3: rgba(255,255,255,0.03);
+        --accent: #4fc3f7;
+        --accent2: #ffb347;
+        --green: #6ee7b7;
+        --purple: #c494ff;
+        --text: rgba(255,255,255,0.9);
+        --text2: rgba(255,255,255,0.5);
+        --text3: rgba(255,255,255,0.25);
+        --border: rgba(255,255,255,0.07);
+        --font-sans: 'Space Grotesk', sans-serif;
+        --font-mono: 'JetBrains Mono', monospace;
+      }
+      html { background: var(--bg); color: var(--text); font-family: var(--font-sans); }
+      body { min-height: 100vh; }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+    </style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>

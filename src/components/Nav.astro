@@ -1,0 +1,103 @@
+---
+const links = [
+  { href: '/observatory/objects', label: 'objects' },
+  { href: '/observatory/log', label: 'log' },
+  { href: '/observatory/about', label: 'about' },
+];
+const path = Astro.url.pathname;
+---
+<nav>
+  <a class="logo" href="/observatory/">ET — OBS/1</a>
+  <div class="links">
+    {links.map(l => (
+      <a href={l.href} class={path === l.href ? 'active' : ''}>{l.label}</a>
+    ))}
+  </div>
+  <div class="status">
+    <span class="dot" id="statusDot"></span>
+    <span class="status-text" id="statusText">—</span>
+  </div>
+</nav>
+
+<style>
+  nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 40px;
+    border-bottom: 0.5px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+    z-index: 100;
+  }
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--accent);
+    letter-spacing: 0.08em;
+    text-decoration: none;
+  }
+  .links {
+    display: flex;
+    gap: 28px;
+  }
+  .links a {
+    font-size: 13px;
+    color: var(--text2);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    transition: color 0.2s;
+  }
+  .links a:hover, .links a.active { color: var(--accent); }
+  .status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--text3);
+    transition: background 0.4s;
+  }
+  .dot.online { background: #4ade80; box-shadow: 0 0 6px #4ade8088; animation: pulse 2.5s infinite; }
+  .dot.offline { background: #f87171; }
+  .status-text {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--text3);
+    transition: color 0.4s;
+  }
+  .status-text.online { color: var(--text2); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  @media (max-width: 600px) {
+    nav { padding: 12px 20px; }
+    .status { display: none; }
+  }
+</style>
+
+<script>
+  async function checkStatus() {
+    const dot = document.getElementById('statusDot');
+    const txt = document.getElementById('statusText');
+    try {
+      const res = await fetch('https://api.github.com/repos/ETurriza/observatory/commits?per_page=1');
+      const data = await res.json();
+      const lastDate = new Date(data[0].commit.author.date);
+      const diffDays = Math.floor((Date.now() - lastDate.getTime()) / 86400000);
+      if (diffDays <= 7) {
+        dot.classList.add('online');
+        txt.classList.add('online');
+        txt.textContent = diffDays === 0 ? 'activo hoy' : `activo hace ${diffDays}d`;
+      } else {
+        dot.classList.add('offline');
+        txt.textContent = `last commit: ${diffDays}d ago`;
+      }
+    } catch {
+      txt.textContent = 'offline';
+    }
+  }
+  checkStatus();
+</script>

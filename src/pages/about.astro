@@ -1,0 +1,109 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+---
+<Layout title="About — Eduardo Turriza">
+  <Nav />
+  <main>
+    <div class="about-wrap">
+      <div class="left">
+        <p class="label">// el observador</p>
+        <h1>Eduardo Turriza</h1>
+        <p class="role">Computer Engineering · ITAM · México</p>
+
+        <div class="bio">
+          <p>Soy estudiante de Ingeniería en Computación en el ITAM, con graduación en marzo 2027. Este verano me uno al <a href="https://braingeneers.gi.ucsc.edu" target="_blank">Braingeneers Lab</a> en UC Santa Cruz como parte del programa ISRP, donde voy a trabajar en deep learning aplicado a electrofisiología neuronal.</p>
+          <p>Me muevo entre tres mundos: el hardware de bajo nivel (AVR assembly, FPGAs, sistemas embebidos), la astrofísica computacional (gaiatools, Hypatia), y el machine learning (PyTorch, señales neuronales). No sé exactamente dónde va a converger eso todavía, y eso es parte del punto.</p>
+          <p>Fuera del código me interesa la astrofísica observacional, la narrativa científica, y eventualmente la actuación.</p>
+        </div>
+
+        <div class="links-section">
+          <p class="label" style="margin-bottom: 14px;">// links</p>
+          <div class="links">
+            <a href="https://github.com/ETurriza" target="_blank" class="ext-link">GitHub</a>
+            <a href="https://pypi.org/project/gaiatools" target="_blank" class="ext-link">PyPI — gaiatools</a>
+            <a href="mailto:eturriza@itam.mx" class="ext-link">eturriza@itam.mx</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="card">
+          <p class="card-label">Stack técnico</p>
+          <div class="stack-groups">
+            <div class="group">
+              <span class="group-title">Sistemas</span>
+              <div class="tags">
+                <span>AVR Assembly</span><span>VHDL/FPGA</span><span>C/C++</span><span>CUDA</span><span>OpenMP</span><span>MPI</span>
+              </div>
+            </div>
+            <div class="group">
+              <span class="group-title">ML / Data</span>
+              <div class="tags">
+                <span>PyTorch</span><span>Python</span><span>HDBSCAN</span><span>MNE-Python</span><span>Plotly</span>
+              </div>
+            </div>
+            <div class="group">
+              <span class="group-title">Infra</span>
+              <div class="tags">
+                <span>AWS</span><span>GitHub Actions</span><span>PyPI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <p class="card-label">Ahora mismo</p>
+          <ul class="now-list">
+            <li>Preparando fundamentos para Braingeneers Lab (junio 2026)</li>
+            <li>Karpathy — Neural Networks: Zero to Hero</li>
+            <li>Neuromatch Academy — señales neuronales</li>
+            <li>Explorando la frontera astrofísica / neurociencia</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main { padding: 48px 40px; max-width: 1000px; margin: 0 auto; }
+  .about-wrap { display: grid; grid-template-columns: 1fr 340px; gap: 60px; align-items: start; }
+  .label { font-family: var(--font-mono); font-size: 10px; color: rgba(79,195,247,0.6); letter-spacing: 0.14em; margin-bottom: 12px; }
+  h1 { font-size: 32px; font-weight: 500; margin-bottom: 6px; }
+  .role { font-family: var(--font-mono); font-size: 12px; color: var(--text3); margin-bottom: 32px; }
+  .bio { display: flex; flex-direction: column; gap: 18px; margin-bottom: 40px; }
+  .bio p { font-size: 15px; color: var(--text2); line-height: 1.8; }
+  .bio a { color: var(--accent); }
+  .links { display: flex; flex-direction: column; gap: 10px; }
+  .ext-link {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--accent);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ext-link::before { content: '→'; color: var(--text3); }
+  .ext-link:hover { text-decoration: underline; }
+  .card {
+    background: rgba(255,255,255,0.02);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .card-label { font-family: var(--font-mono); font-size: 10px; color: var(--text3); letter-spacing: 0.1em; margin-bottom: 16px; }
+  .stack-groups { display: flex; flex-direction: column; gap: 14px; }
+  .group-title { font-size: 11px; color: var(--text3); display: block; margin-bottom: 7px; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags span { font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 0.5px solid var(--border); color: var(--text2); }
+  .now-list { padding-left: 0; list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .now-list li { font-size: 13px; color: var(--text2); line-height: 1.5; padding-left: 14px; position: relative; }
+  .now-list li::before { content: '·'; position: absolute; left: 0; color: var(--accent); }
+  @media (max-width: 760px) {
+    .about-wrap { grid-template-columns: 1fr; gap: 40px; }
+    main { padding: 28px 20px; }
+  }
+</style>

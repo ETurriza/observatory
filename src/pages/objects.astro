@@ -1,0 +1,118 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+
+const projects = [
+  {
+    id: 'NGC-001',
+    name: 'gaiatools',
+    type: 'nebulosa',
+    color: '#4fc3f7',
+    year: '2025',
+    stack: ['Python', 'PyPI', 'HDBSCAN', 'Plotly'],
+    desc: 'Python library para queries y análisis del catálogo estelar ESA Gaia DR3. Incluye clustering con HDBSCAN, diagramas HR interactivos, crossmatching con NASA Exoplanet Archive, y CI/CD con GitHub Actions.',
+    link: 'https://github.com/ETurriza/gaiatools',
+  },
+  {
+    id: 'NGC-003',
+    name: 'Robot bombero',
+    type: 'satélite',
+    color: '#6ee7b7',
+    year: '2024',
+    stack: ['AVR Assembly', 'ATmega2560', 'C'],
+    desc: 'Máquina de 4 estados implementada en AVR assembly puro para ATmega2560. Detecta llamas con fotoresistores, sigue líneas, identifica bases por color con sensor TCS230, y extingue fuego con bomba de agua vía servo.',
+    link: 'https://github.com/ETurriza',
+  },
+  {
+    id: 'NGC-004',
+    name: 'DBSCAN paralelo',
+    type: 'cúmulo',
+    color: '#f472b6',
+    year: '2024',
+    stack: ['C++', 'OpenMP', 'MPI'],
+    desc: 'Implementación paralela del algoritmo DBSCAN en C++. Versión OpenMP logra 2.0x speedup sobre serial con 900k+ registros. Parte de un proyecto de cómputo paralelo con análisis de escalabilidad.',
+    link: 'https://github.com/ETurriza',
+  },
+  {
+    id: 'NGC-005',
+    name: 'U-Net denoising',
+    type: 'señal débil',
+    color: '#a78bfa',
+    year: '2024',
+    stack: ['PyTorch', 'Python', 'CNN'],
+    desc: 'Red convolucional tipo U-Net entrenada para eliminación de ruido en imágenes. Implementación desde cero en PyTorch con encoder-decoder simétrico y skip connections.',
+    link: 'https://github.com/ETurriza',
+  },
+  {
+    id: 'NGC-006',
+    name: 'Braingeneers',
+    type: 'nebulosa en formación',
+    color: '#c494ff',
+    year: '2026',
+    stack: ['PyTorch', 'MNE-Python', 'AWS', 'Electrofisiología'],
+    desc: 'Caracterización de redes neuronales emergentes usando deep learning aplicado a datos de electrofisiología. ISRP Program · UC Santa Cruz · verano 2026. En curso.',
+    link: 'https://braingeneers.gi.ucsc.edu',
+  },
+];
+---
+<Layout title="Objetos — Eduardo Turriza">
+  <Nav />
+  <main>
+    <div class="header">
+      <p class="label">// catálogo de objetos</p>
+      <h1>Proyectos</h1>
+      <p class="subtitle">Cada proyecto es un objeto celeste. El tipo codifica su naturaleza.</p>
+    </div>
+    <div class="grid">
+      {projects.map(p => (
+        <article class="card">
+          <div class="card-header">
+            <span class="obj-id">{p.id}</span>
+            <span class="obj-type" style={`color:${p.color}; background:${p.color}18; border-color:${p.color}40`}>{p.type}</span>
+          </div>
+          <h2>{p.name}</h2>
+          <p class="desc">{p.desc}</p>
+          <div class="stack">
+            {p.stack.map(s => <span class="tag">{s}</span>)}
+          </div>
+          <div class="card-footer">
+            <span class="year">{p.year}</span>
+            <a href={p.link} target="_blank" class="link" style={`color:${p.color}`}>ver repositorio →</a>
+          </div>
+        </article>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main { padding: 48px 40px; max-width: 1100px; margin: 0 auto; }
+  .header { margin-bottom: 40px; }
+  .label { font-family: var(--font-mono); font-size: 10px; color: rgba(79,195,247,0.6); letter-spacing: 0.14em; margin-bottom: 12px; }
+  h1 { font-size: 32px; font-weight: 500; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: var(--text2); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+  .card {
+    background: rgba(255,255,255,0.02);
+    border: 0.5px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: rgba(255,255,255,0.15); }
+  .card-header { display: flex; justify-content: space-between; align-items: center; }
+  .obj-id { font-family: var(--font-mono); font-size: 10px; color: var(--text3); }
+  .obj-type { font-family: var(--font-mono); font-size: 10px; padding: 2px 9px; border-radius: 10px; border: 0.5px solid; }
+  h2 { font-size: 16px; font-weight: 500; }
+  .desc { font-size: 12px; color: var(--text2); line-height: 1.7; flex: 1; }
+  .stack { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 8px; border-radius: 4px; background: rgba(255,255,255,0.04); border: 0.5px solid var(--border); color: var(--text3); }
+  .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; }
+  .year { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
+  .link { font-family: var(--font-mono); font-size: 11px; text-decoration: none; }
+  .link:hover { text-decoration: underline; }
+  @media (max-width: 600px) { main { padding: 28px 20px; } }
+</style>

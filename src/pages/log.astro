@@ -1,0 +1,62 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Nav from '../components/Nav.astro';
+
+const entries = [
+  { date: '2026-05-04', tag: 'braingeneers', title: 'T-36 días', body: 'Semana 8 del plan de preparación. Terminé el ejercicio de backpropagation de Karpathy. Esta semana arranco con señales neuronales en Neuromatch Academy. El conteo regresivo en el homepage se siente cada vez más real.' },
+  { date: '2026-04-18', tag: 'cern', title: 'Rechazado de CERN', body: 'Llegaron los resultados del CERN Summer Student y openlab. Ambos: no. No es lo que quería leer, pero tampoco es el fin. Braingeneers es un destino mejor para lo que quiero hacer este verano.' },
+  { date: '2026-03-10', tag: 'gaiatools', title: 'gaiatools en PyPI', body: 'Primera versión pública de gaiatools disponible en PyPI. Tardé más de lo que esperaba en el pipeline de CI/CD con GitHub Actions, pero funciona. Ahora cualquiera puede hacer `pip install gaiatools` y consultar el catálogo Gaia DR3.' },
+  { date: '2025-12-20', tag: 'paralelo', title: '2x speedup con OpenMP', body: 'Proyecto final de cómputo paralelo: implementé DBSCAN en C++ con tres versiones (serial, OpenMP P1, OpenMP P2). La versión paralela logró 2.0x speedup sobre serial con 900k+ registros. El análisis de escalabilidad fue lo más interesante.' },
+];
+
+const tagColors: Record<string,string> = {
+  braingeneers: '#c494ff',
+  hypatia: '#ffb347',
+  gaiatools: '#4fc3f7',
+  cern: '#f87171',
+  paralelo: '#6ee7b7',
+  actuación: '#f472b6',
+};
+---
+<Layout title="Bitácora — Eduardo Turriza">
+  <Nav />
+  <main>
+    <div class="header">
+      <p class="label">// bitácora de observación</p>
+      <h1>Log</h1>
+      <p class="subtitle">Lo que estoy haciendo, aprendiendo y pensando. Actualizado irregularmente.</p>
+    </div>
+    <div class="entries">
+      {entries.map(e => (
+        <article class="entry">
+          <div class="entry-meta">
+            <span class="entry-date">{e.date}</span>
+            <span class="entry-tag" style={`color:${tagColors[e.tag] ?? '#888'}; background:${tagColors[e.tag] ?? '#888'}18; border-color:${tagColors[e.tag] ?? '#888'}40`}>{e.tag}</span>
+          </div>
+          <h2>{e.title}</h2>
+          <p>{e.body}</p>
+        </article>
+      ))}
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main { padding: 48px 40px; max-width: 720px; margin: 0 auto; }
+  .header { margin-bottom: 48px; }
+  .label { font-family: var(--font-mono); font-size: 10px; color: rgba(79,195,247,0.6); letter-spacing: 0.14em; margin-bottom: 12px; }
+  h1 { font-size: 32px; font-weight: 500; margin-bottom: 8px; }
+  .subtitle { font-size: 14px; color: var(--text2); }
+  .entries { display: flex; flex-direction: column; }
+  .entry {
+    padding: 28px 0;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .entry:last-child { border-bottom: none; }
+  .entry-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .entry-date { font-family: var(--font-mono); font-size: 11px; color: var(--text3); }
+  .entry-tag { font-family: var(--font-mono); font-size: 10px; padding: 2px 9px; border-radius: 10px; border: 0.5px solid; }
+  h2 { font-size: 17px; font-weight: 500; margin-bottom: 10px; }
+  p { font-size: 14px; color: var(--text2); line-height: 1.8; }
+  @media (max-width: 600px) { main { padding: 28px 20px; } }
+</style>
