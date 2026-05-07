@@ -1,43 +1,58 @@
-# Astro Starter Kit: Minimal
+# Observatory
 
-```sh
-npm create astro@latest -- --template minimal
-```
+Interactive portfolio built with Astro, JavaScript, CSS and Three.js.
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+The project presents academic and technical work as celestial objects inside a digital observatory. The main interface is a 2D control panel, while the 3D observatory works as an interactive deep-space experience.
 
-## 🚀 Project Structure
+## Live Site
 
-Inside of your Astro project, you'll see the following folders and files:
+https://eturriza.github.io/observatory/
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+## Overview
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+Observatory is a personal portfolio designed around a space exploration interface. Each project is represented as an object in the system, with summaries, tags and links to repositories or external pages.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+The site includes:
 
-Any static assets, like images, can be placed in the `public/` directory.
+- 2D control interface
+- interactive project map
+- project catalog
+- 3D exploration mode
+- automatic 3D tour
+- project modals
+- black hole 404 easter egg
+- GitHub Pages deployment
 
-## 🧞 Commands
+## Featured Objects
 
-All commands are run from the root of the project, from a terminal:
+- gaiatools
+- Robot bombero
+- Braingeneers
+- DBSCAN paralelo
+- Bases de Datos
+- 1er lugar LIDERA
+- UPF Barcelona
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:4321`      |
-| `npm run build`           | Build your production site to `./dist/`          |
-| `npm run preview`         | Preview your build locally, before deploying     |
-| `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `npm run astro -- --help` | Get help using the Astro CLI                     |
+## Tech Stack
 
-## 👀 Want to learn more?
+- Astro
+- HTML
+- CSS
+- JavaScript
+- Three.js
+- WebGL
+- GitHub Pages
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+## Project Structure
+
+```txt
+src/pages/
+  index.astro      # 2D control interface
+  space.astro      # 3D observatory
+  objects.astro    # project catalog
+  about.astro      # profile
+  log.astro        # log page
+  404.astro        # black hole 404 page
+
+public/
+  textures/        # 3D textures
