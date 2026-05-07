@@ -47,6 +47,23 @@
     .sb-fill{height:100%;background:#dff4ff;border-radius:2px;width:0%;transition:width .08s;box-shadow:0 0 6px rgba(223,244,255,.42)}
     #controls-hint{position:absolute;bottom:60px;right:28px;font-size:8px;color:rgba(255,255,255,.19);line-height:1.9;z-index:11;pointer-events:none;text-align:right}
     #controls-hint span{color:rgba(169,217,244,.38)}
+    #blackhole-warning{position:absolute;top:82px;left:50%;transform:translateX(-50%);z-index:12;pointer-events:none;text-align:center;font-size:8px;line-height:1.8;letter-spacing:.16em;color:rgba(255,208,154,0);text-shadow:0 0 14px rgba(255,153,80,.22);transition:opacity .25s,color .25s;opacity:0}
+    #blackhole-warning strong{display:block;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;letter-spacing:.12em;color:inherit}
+    #discovery-toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%) translateY(8px);z-index:12;pointer-events:none;text-align:center;font-size:8px;line-height:1.7;letter-spacing:.14em;color:rgba(223,244,255,0);opacity:0;transition:opacity .35s,transform .35s,color .35s;text-shadow:0 0 14px rgba(169,217,244,.28)}
+    #discovery-toast.on{opacity:1;transform:translateX(-50%) translateY(0);color:rgba(223,244,255,.72)}
+    #discovery-toast strong{display:block;font-family:'Space Grotesk',sans-serif;font-size:11px;font-weight:500;letter-spacing:.08em;color:inherit}
+    #tour-btn,#audio-btn{position:absolute;z-index:12;pointer-events:auto;background:rgba(5,10,18,.48);border:.5px solid rgba(169,217,244,.24);border-radius:7px;color:rgba(223,244,255,.56);font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.12em;padding:8px 12px;cursor:pointer;backdrop-filter:blur(8px);transition:color .2s,border-color .2s,background .2s,box-shadow .2s}
+    #tour-btn:hover,#audio-btn:hover{color:rgba(223,244,255,.92);border-color:rgba(169,217,244,.42);background:rgba(169,217,244,.07);box-shadow:0 0 18px rgba(169,217,244,.08)}
+    #tour-btn.active{color:rgba(255,218,176,.86);border-color:rgba(255,218,176,.36);background:rgba(255,174,91,.07)}
+    #tour-btn{bottom:32px;left:50%;transform:translateX(-50%);margin-left:112px}
+    #audio-btn{bottom:32px;left:50%;transform:translateX(-50%);margin-left:-112px}
+    #container.grav-distort #hud,#container.grav-distort #xhair,#container.grav-distort #controls-hint{filter:drop-shadow(0 0 4px rgba(255,154,90,.18));animation:gravFlicker .16s steps(2,end) infinite}
+    @keyframes gravFlicker{0%,100%{transform:translateX(0)}50%{transform:translateX(.4px)}}
+    #signal-loss{position:absolute;inset:0;z-index:75;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 50%,rgba(9,10,18,.62),rgba(0,0,0,.98) 72%);pointer-events:none;opacity:0;transition:opacity 1s}
+    #signal-loss.on{opacity:1}
+    .loss-box{text-align:center;border:.5px solid rgba(255,218,176,.24);border-radius:14px;padding:28px 38px;background:rgba(0,0,0,.38);box-shadow:0 0 80px rgba(255,132,62,.08)}
+    .loss-code{font-family:'Space Grotesk',sans-serif;font-size:28px;letter-spacing:.08em;color:#fff;text-shadow:0 0 24px rgba(255,201,143,.24)}
+    .loss-sub{margin-top:8px;font-size:9px;letter-spacing:.18em;color:rgba(255,209,165,.58)}
     #intro{position:absolute;inset:0;background:#000;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;transition:opacity 1.2s}
     .il{font-size:11px;color:rgba(169,217,244,0);letter-spacing:.14em;transition:color .5s}
     .il.on{color:rgba(169,217,244,.62)}
@@ -132,12 +149,28 @@
     <span class="sb-l">VEL</span>
     <div class="sb-track"><div class="sb-fill" id="sbfill"></div></div>
   </div>
+  <button id="audio-btn" type="button">AUDIO OFF</button>
+  <button id="tour-btn" type="button">INICIAR TOUR</button>
+  <div id="discovery-toast">
+    <strong>OBJETO REGISTRADO</strong>
+    <span id="discovery-name">--</span>
+  </div>
   <div id="controls-hint">
     <span>WASD</span> mover · <span>MOUSE</span> mirar<br>
     <span>SPACE</span> subir · <span>SHIFT</span> bajar<br>
     <span>E</span> inspeccionar
   </div>
   <div id="flyby-alert" style="position:absolute;top:76px;left:50%;transform:translateX(-50%);font-size:8px;color:rgba(223,244,255,0);letter-spacing:.14em;z-index:11;pointer-events:none;text-shadow:0 0 10px rgba(223,244,255,.24);transition:color .35s, opacity .35s;opacity:0">CONTACTO VISUAL DETECTADO</div>
+  <div id="blackhole-warning">
+    <strong>ANOMALIA GRAVITACIONAL DETECTADA</strong>
+    <span id="blackhole-distance">DISTANCIA: --</span>
+  </div>
+  <div id="signal-loss">
+    <div class="loss-box">
+      <div class="loss-code">404</div>
+      <div class="loss-sub">SIGNAL LOST BEYOND EVENT HORIZON</div>
+    </div>
+  </div>
   <div id="loading">
     <div class="load-text" id="loadText">CARGANDO TEXTURAS...</div>
     <div class="load-bar-wrap"><div class="load-bar" id="loadBar"></div></div>
@@ -170,8 +203,139 @@ import * as THREE from 'three';
 import { EffectComposer, RenderPass, BloomEffect, EffectPass, HueSaturationEffect, VignetteEffect, ToneMappingEffect, ToneMappingMode } from 'postprocessing';
 
 const BASE = import.meta.env.BASE_URL + 'textures/';
+const ROUTE_BASE = import.meta.env.BASE_URL;
 
 // ── HIGH QUALITY HELPERS ──────────────────────────────────────────────────
+function initAudioEngine() {
+  if (audioEngine) return audioEngine;
+
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  if (!Ctx) return null;
+
+  const ctx = new Ctx();
+  const master = ctx.createGain();
+  master.gain.value = 0.0;
+  master.connect(ctx.destination);
+
+  const ambient = ctx.createGain();
+  ambient.gain.value = 0.055;
+  ambient.connect(master);
+
+  const gravity = ctx.createGain();
+  gravity.gain.value = 0.0;
+  gravity.connect(master);
+
+  const hum = ctx.createOscillator();
+  hum.type = 'sine';
+  hum.frequency.value = 48;
+  hum.connect(ambient);
+  hum.start();
+
+  const low = ctx.createOscillator();
+  low.type = 'triangle';
+  low.frequency.value = 96;
+  const lowGain = ctx.createGain();
+  lowGain.gain.value = 0.018;
+  low.connect(lowGain);
+  lowGain.connect(ambient);
+  low.start();
+
+  const gravityOsc = ctx.createOscillator();
+  gravityOsc.type = 'sawtooth';
+  gravityOsc.frequency.value = 34;
+  const gravityFilter = ctx.createBiquadFilter();
+  gravityFilter.type = 'lowpass';
+  gravityFilter.frequency.value = 180;
+  gravityOsc.connect(gravityFilter);
+  gravityFilter.connect(gravity);
+  gravityOsc.start();
+
+  audioEngine = { ctx, master, ambient, gravity, hum, low, gravityOsc, gravityFilter };
+  return audioEngine;
+}
+
+function setAudioEnabled(enabled) {
+  const engine = initAudioEngine();
+  if (!engine) return;
+
+  if (engine.ctx.state === 'suspended') engine.ctx.resume();
+
+  audioEnabled = enabled;
+  const now = engine.ctx.currentTime;
+  engine.master.gain.cancelScheduledValues(now);
+  engine.master.gain.linearRampToValueAtTime(enabled ? 0.38 : 0.0, now + 0.55);
+
+  const btn = document.getElementById('audio-btn');
+  if (btn) btn.textContent = enabled ? 'AUDIO ON' : 'AUDIO OFF';
+}
+
+function playDiscoverySound() {
+  const engine = initAudioEngine();
+  if (!engine || !audioEnabled) return;
+
+  const ctx = engine.ctx;
+  const now = ctx.currentTime;
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  const filter = ctx.createBiquadFilter();
+
+  osc.type = 'sine';
+  osc.frequency.setValueAtTime(880, now);
+  osc.frequency.exponentialRampToValueAtTime(1320, now + 0.11);
+
+  filter.type = 'bandpass';
+  filter.frequency.value = 1100;
+  filter.Q.value = 8;
+
+  gain.gain.setValueAtTime(0.0, now);
+  gain.gain.linearRampToValueAtTime(0.11, now + 0.018);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.32);
+
+  osc.connect(filter);
+  filter.connect(gain);
+  gain.connect(engine.master);
+
+  osc.start(now);
+  osc.stop(now + 0.35);
+}
+
+function playTourStepSound() {
+  const engine = initAudioEngine();
+  if (!engine || !audioEnabled) return;
+
+  const ctx = engine.ctx;
+  const now = ctx.currentTime;
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(330, now);
+  osc.frequency.exponentialRampToValueAtTime(495, now + 0.18);
+
+  gain.gain.setValueAtTime(0.0, now);
+  gain.gain.linearRampToValueAtTime(0.065, now + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.001, now + 0.42);
+
+  osc.connect(gain);
+  gain.connect(engine.master);
+  osc.start(now);
+  osc.stop(now + 0.44);
+}
+
+function updateGravityAudio(intensity) {
+  const engine = initAudioEngine();
+  if (!engine || !audioEnabled) return;
+
+  const now = engine.ctx.currentTime;
+  const target = Math.max(0, Math.min(1, intensity));
+  engine.gravity.gain.cancelScheduledValues(now);
+  engine.gravity.gain.linearRampToValueAtTime(0.11 * target, now + 0.12);
+  engine.gravityOsc.frequency.setTargetAtTime(34 + target * 18, now, 0.12);
+  engine.gravityFilter.frequency.setTargetAtTime(180 + target * 260, now, 0.12);
+}
+
+
 function setSRGB(tex) {
   if (!tex) return tex;
   if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
@@ -202,6 +366,97 @@ function makeRadialSprite(size = 128, inner = 'rgba(255,255,255,1)', mid = 'rgba
 const starSprite = makeRadialSprite(96, 'rgba(255,255,255,1)', 'rgba(255,255,255,.42)', 'rgba(255,255,255,0)');
 const dustSprite = makeRadialSprite(128, 'rgba(255,255,255,.8)', 'rgba(255,255,255,.14)', 'rgba(255,255,255,0)');
 const flareSprite = makeRadialSprite(192, 'rgba(255,246,218,1)', 'rgba(255,192,104,.25)', 'rgba(255,160,80,0)');
+
+
+function makeGuaranteedSunTexture(size = 1024) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = size / 2;
+
+  // Transparent outside, visible solar disk inside.
+  ctx.clearRect(0, 0, size, size);
+
+  const disk = ctx.createRadialGradient(cx, cy, size * 0.03, cx, cy, r * 0.98);
+  disk.addColorStop(0.00, '#fff7c7');
+  disk.addColorStop(0.18, '#ffd05f');
+  disk.addColorStop(0.42, '#ff8a27');
+  disk.addColorStop(0.70, '#d64916');
+  disk.addColorStop(1.00, '#7b1707');
+
+  ctx.fillStyle = disk;
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.98, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Plasma granulation
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r * 0.98, 0, Math.PI * 2);
+  ctx.clip();
+
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 6800; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const rr = Math.sqrt(Math.random()) * r * 0.96;
+    const x = cx + Math.cos(a) * rr;
+    const y = cy + Math.sin(a) * rr;
+    const cell = 1.2 + Math.random() * 6.5;
+    const alpha = 0.018 + Math.random() * 0.07;
+    ctx.fillStyle = `rgba(255,${150 + Math.random()*95},${45 + Math.random()*45},${alpha})`;
+    ctx.beginPath();
+    ctx.arc(x, y, cell, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.globalCompositeOperation = 'multiply';
+  for (let i = 0; i < 950; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const rr = Math.sqrt(Math.random()) * r * 0.94;
+    const x = cx + Math.cos(a) * rr;
+    const y = cy + Math.sin(a) * rr;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(a + Math.PI / 2 + (Math.random() - 0.5));
+    ctx.fillStyle = `rgba(95,23,8,${0.025 + Math.random()*0.09})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, 5 + Math.random()*22, 1.2 + Math.random()*5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Hot active regions
+  ctx.globalCompositeOperation = 'screen';
+  for (let i = 0; i < 16; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const rr = Math.sqrt(Math.random()) * r * 0.72;
+    const x = cx + Math.cos(a) * rr;
+    const y = cy + Math.sin(a) * rr;
+    const spot = ctx.createRadialGradient(x, y, 0, x, y, 22 + Math.random() * 58);
+    spot.addColorStop(0, 'rgba(255,255,210,.35)');
+    spot.addColorStop(0.45, 'rgba(255,205,80,.16)');
+    spot.addColorStop(1, 'rgba(255,120,20,0)');
+    ctx.fillStyle = spot;
+    ctx.beginPath();
+    ctx.arc(x, y, 80, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  ctx.restore();
+
+  const tex = new THREE.CanvasTexture(c);
+  if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+  else tex.encoding = THREE.sRGBEncoding;
+  tex.anisotropy = Math.min(renderer?.capabilities?.getMaxAnisotropy?.() || 8, 16);
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  tex.needsUpdate = true;
+  return tex;
+}
+
 
 // ── ATMOSPHERE SHADERS: thin physically inspired limb scattering ──────────
 const atmoVert = `
@@ -270,6 +525,16 @@ const container = document.getElementById('renderer');
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x000006, 0.000052);
 const cosmicAccents = [];
+let blackHole = null;
+let blackHoleTriggered = false;
+let blackHoleGameActive = false;
+let audioEngine = null;
+let audioEnabled = false;
+let currentTourIndex = 0;
+let tourActive = false;
+let tourTarget = null;
+let tourHold = 0;
+let tourTransition = null;
 
 const camera = new THREE.PerspectiveCamera(62, window.innerWidth/window.innerHeight, 0.05, 20000);
 camera.position.set(0, 4, 0);
@@ -298,9 +563,9 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 
 const bloomEffect = new BloomEffect({
-  intensity: 0.78,
-  luminanceThreshold: 0.7,
-  luminanceSmoothing: 0.44,
+  intensity: 0.84,
+  luminanceThreshold: 0.66,
+  luminanceSmoothing: 0.42,
   mipmapBlur: true,
 });
 
@@ -316,18 +581,18 @@ const vignetteEffect = new VignetteEffect({
 
 const toneMappingEffect = new ToneMappingEffect({
   mode: ToneMappingMode.ACES_FILMIC,
-  exposure: 1.13,
+  exposure: 1.22,
   whitePoint: 7.2,
-  middleGrey: 0.55,
+  middleGrey: 0.62,
 });
 
 composer.addPass(new EffectPass(camera, bloomEffect, hueSatEffect, vignetteEffect, toneMappingEffect));
 
 // ── LIGHTING ───────────────────────────────────────────────────────────────
-scene.add(new THREE.AmbientLight(0x101729, 0.042));
+scene.add(new THREE.AmbientLight(0x18243a, 0.11));
 
 const sunPos = new THREE.Vector3(620, 270, -260);
-const sunLight = new THREE.PointLight(0xfff0d2, 75000, 0, 2);
+const sunLight = new THREE.PointLight(0xfff0d2, 220000, 0, 2);
 sunLight.position.copy(sunPos);
 sunLight.castShadow = true;
 sunLight.shadow.mapSize.width = 2048;
@@ -336,17 +601,27 @@ sunLight.shadow.camera.near = 1;
 sunLight.shadow.camera.far = 1600;
 scene.add(sunLight);
 
-const solarKey = new THREE.DirectionalLight(0xfff2d8, 3.1);
+const solarKey = new THREE.DirectionalLight(0xfff2d8, 5.2);
 solarKey.position.copy(sunPos).normalize();
 scene.add(solarKey);
 
-const coldSpaceFill = new THREE.HemisphereLight(0x2d3d56, 0x020205, 0.105);
+const coldSpaceFill = new THREE.HemisphereLight(0x536f9a, 0x05070c, 0.28);
 scene.add(coldSpaceFill);
+
+const observerFill = new THREE.DirectionalLight(0xa9cfff, 1.15);
+observerFill.position.set(-0.35, 0.22, 1.0).normalize();
+scene.add(observerFill);
+
+// Soft headlamp-style fill. It follows the camera and prevents planets from becoming pure silhouettes.
+const cameraFill = new THREE.PointLight(0xd8ebff, 95, 900, 1.25);
+cameraFill.position.set(0, 0, 0);
+camera.add(cameraFill);
+scene.add(camera);
 
 // ── TEXTURE LOADER ─────────────────────────────────────────────────────────
 const loader = new THREE.TextureLoader();
 let loaded = 0;
-const toLoad = 10;
+const toLoad = 9;
 let started = false;
 
 function onLoad() {
@@ -366,7 +641,6 @@ function loadTex(name) {
 
 const T = {
   milkyway: loadTex('8k_stars_milky_way.jpg'),
-  sun:      loadTex('8k_sun.jpg'),
   jupiter:  loadTex('8k_jupiter.jpg'),
   mars:     loadTex('8k_mars.jpg'),
   saturn:   loadTex('8k_saturn.jpg'),
@@ -605,6 +879,270 @@ function addSupernovaRemnant({
   return remnant;
 }
 
+
+function makeBlackHoleDiskTexture(size = 768) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const cx = size / 2;
+  const cy = size / 2;
+
+  ctx.clearRect(0, 0, size, size);
+  ctx.translate(cx, cy);
+  ctx.scale(1, 0.48);
+
+  // Warm accretion body
+  const g = ctx.createRadialGradient(0, 0, size * 0.08, 0, 0, size * 0.36);
+  g.addColorStop(0.00, 'rgba(255,245,230,0)');
+  g.addColorStop(0.22, 'rgba(255,248,236,.70)');
+  g.addColorStop(0.38, 'rgba(255,196,122,.48)');
+  g.addColorStop(0.55, 'rgba(255,126,62,.22)');
+  g.addColorStop(0.78, 'rgba(90,34,18,.07)');
+  g.addColorStop(1.00, 'rgba(0,0,0,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.36, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Filamentary hot streaks
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 240; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = size * (0.15 + Math.random() * 0.23);
+    const x = Math.cos(a) * r;
+    const y = Math.sin(a) * r;
+    const w = 3 + Math.random() * 18;
+    const h = 0.8 + Math.random() * 2.8;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(a + Math.PI / 2 + (Math.random() - 0.5) * 0.5);
+    const alpha = 0.04 + Math.random() * 0.08;
+    ctx.fillStyle = `rgba(255,220,170,${alpha})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, w, h, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Transparent hole in the center
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(0, 0, size * 0.115, 0, Math.PI * 2);
+  ctx.fill();
+
+  const tex = new THREE.CanvasTexture(c);
+  if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  return tex;
+}
+
+function makeBlackHoleLensingTexture(size = 768) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  const cx = size / 2;
+  const cy = size / 2;
+
+  ctx.clearRect(0, 0, size, size);
+
+  // Outer warped halo
+  const halo = ctx.createRadialGradient(cx, cy, size * 0.14, cx, cy, size * 0.42);
+  halo.addColorStop(0.00, 'rgba(255,255,255,0)');
+  halo.addColorStop(0.18, 'rgba(255,244,225,.14)');
+  halo.addColorStop(0.34, 'rgba(226,210,194,.12)');
+  halo.addColorStop(0.52, 'rgba(188,156,170,.08)');
+  halo.addColorStop(0.70, 'rgba(130,112,128,.04)');
+  halo.addColorStop(1.00, 'rgba(0,0,0,0)');
+  ctx.fillStyle = halo;
+  ctx.beginPath();
+  ctx.arc(cx, cy, size * 0.42, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Distorted streaks to fake gravitational lensing
+  ctx.globalCompositeOperation = 'lighter';
+  for (let i = 0; i < 340; i++) {
+    const a = Math.random() * Math.PI * 2;
+    const r = size * (0.20 + Math.random() * 0.17);
+    const x = cx + Math.cos(a) * r;
+    const y = cy + Math.sin(a) * r;
+    const rot = a + Math.PI / 2 + (Math.random() - 0.5) * 0.28;
+    const len = 12 + Math.random() * 36;
+    const wid = 1.0 + Math.random() * 3.2;
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate(rot);
+    const alpha = 0.018 + Math.random() * 0.05;
+    ctx.fillStyle = `rgba(255,242,228,${alpha})`;
+    ctx.beginPath();
+    ctx.ellipse(0, 0, len, wid, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+
+  // Dark central lens zone
+  ctx.globalCompositeOperation = 'destination-out';
+  ctx.beginPath();
+  ctx.arc(cx, cy, size * 0.14, 0, Math.PI * 2);
+  ctx.fill();
+
+  const tex = new THREE.CanvasTexture(c);
+  if ('colorSpace' in tex && THREE.SRGBColorSpace) tex.colorSpace = THREE.SRGBColorSpace;
+  tex.minFilter = THREE.LinearMipmapLinearFilter;
+  tex.magFilter = THREE.LinearFilter;
+  tex.generateMipmaps = true;
+  return tex;
+}
+
+
+function createBlackHole(position = new THREE.Vector3(-540, 42, -790)) {
+  const group = new THREE.Group();
+  group.position.copy(position);
+
+  const outerGlow = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: flareSprite,
+    color: 0xb18fa2,
+    transparent: true,
+    opacity: 0.055,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false,
+  }));
+  outerGlow.scale.set(220, 220, 1);
+  group.add(outerGlow);
+
+  const lensingHalo = new THREE.Sprite(new THREE.SpriteMaterial({
+    map: makeBlackHoleLensingTexture(),
+    color: 0xf4e4dd,
+    transparent: true,
+    opacity: 0.62,
+    blending: THREE.AdditiveBlending,
+    depthWrite: false,
+    fog: false,
+  }));
+  lensingHalo.scale.set(190, 190, 1);
+  group.add(lensingHalo);
+
+  const diskBack = new THREE.Mesh(
+    new THREE.PlaneGeometry(170, 170),
+    new THREE.MeshBasicMaterial({
+      map: makeBlackHoleDiskTexture(),
+      color: 0xffc999,
+      transparent: true,
+      opacity: 0.52,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      fog: false,
+    })
+  );
+  diskBack.rotation.x = Math.PI / 2.58;
+  diskBack.rotation.z = 0.34;
+  diskBack.scale.set(1.0, 0.58, 1.0);
+  diskBack.userData = { isAccretionDisk: true, speed: 0.00075 };
+  group.add(diskBack);
+
+  const diskFront = new THREE.Mesh(
+    new THREE.PlaneGeometry(182, 182),
+    new THREE.MeshBasicMaterial({
+      map: makeBlackHoleDiskTexture(),
+      color: 0xffb980,
+      transparent: true,
+      opacity: 0.44,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+      fog: false,
+    })
+  );
+  diskFront.rotation.x = Math.PI / 2.52;
+  diskFront.rotation.z = -0.16;
+  diskFront.scale.set(1.0, 0.52, 1.0);
+  diskFront.userData = { isAccretionDisk: true, speed: -0.00042 };
+  group.add(diskFront);
+
+  const horizon = new THREE.Mesh(
+    new THREE.SphereGeometry(28, 72, 72),
+    new THREE.MeshBasicMaterial({ color: 0x000000, fog: false })
+  );
+  group.add(horizon);
+
+  const photonRing = new THREE.Mesh(
+    new THREE.RingGeometry(29.8, 34.2, 128),
+    new THREE.MeshBasicMaterial({
+      color: 0xe8d7cf,
+      transparent: true,
+      opacity: 0.24,
+      side: THREE.DoubleSide,
+      blending: THREE.AdditiveBlending,
+      depthWrite: false,
+      fog: false,
+    })
+  );
+  photonRing.rotation.x = Math.PI / 2;
+  group.add(photonRing);
+
+  group.userData = {
+    warningRadius: 280,
+    triggerRadius: 58,
+  };
+
+  scene.add(group);
+  blackHole = group;
+  return group;
+}
+
+function updateBlackHoleEvent() {
+  if (!blackHole || blackHoleTriggered) return;
+
+  blackHole.rotation.y += 0.00028;
+  blackHole.children.forEach((ch, i) => {
+    if (ch.userData?.isAccretionDisk) ch.rotation.z += ch.userData.speed;
+    if (ch.material && ch.material.opacity !== undefined && i < 2) {
+      ch.material.opacity = (i === 0 ? 0.05 : 0.62) * (0.96 + Math.sin(performance.now() * 0.00035 + i) * 0.04);
+    }
+  });
+
+  // Important: do not reference local buildScene() variables here.
+  if (!blackHoleGameActive) return;
+
+  const distance = camera.position.distanceTo(blackHole.position);
+  const warning = document.getElementById('blackhole-warning');
+  const distanceLabel = document.getElementById('blackhole-distance');
+  const warningRadius = blackHole.userData.warningRadius;
+  const triggerRadius = blackHole.userData.triggerRadius;
+
+  const gravityIntensity = distance < warningRadius
+    ? 1 - Math.max(0, Math.min(1, (distance - triggerRadius) / (warningRadius - triggerRadius)))
+    : 0;
+
+  updateGravityAudio(gravityIntensity);
+
+  const containerEl = document.getElementById('container');
+  if (containerEl) containerEl.classList.toggle('grav-distort', gravityIntensity > 0.42);
+
+  if (warning && distance < warningRadius) {
+    warning.style.opacity = String(0.28 + gravityIntensity * 0.72);
+    warning.style.color = `rgba(255,208,154,${0.35 + gravityIntensity * 0.52})`;
+    if (distanceLabel) distanceLabel.textContent = 'DISTANCIA: ' + Math.round(distance) + ' M · EVITAR HORIZONTE DE EVENTOS';
+  } else if (warning) {
+    warning.style.opacity = '0';
+    warning.style.color = 'rgba(255,208,154,0)';
+  }
+
+  if (distance < triggerRadius) {
+    blackHoleTriggered = true;
+    document.exitPointerLock?.();
+    const loss = document.getElementById('signal-loss');
+    if (loss) loss.classList.add('on');
+    setTimeout(() => {
+      window.location.href = ROUTE_BASE + '404';
+    }, 1700);
+  }
+}
+
+
 function createOrbitLine(radius, color = 0x8aa7b8, opacity = 0.13) {
   const pts = [];
   for (let i = 0; i <= 192; i++) {
@@ -682,12 +1220,23 @@ function buildScene() {
     opacity: 0.045,
   });
 
+  // Special 404 event: hidden gravitational anomaly.
+  createBlackHole(new THREE.Vector3(-700, 70, -720));
+
   // Sun with tight corona and an optical flare plane.
+  const sunMaterial = new THREE.MeshBasicMaterial({
+    map: makeGuaranteedSunTexture(),
+    color: 0xffffff,
+    fog: false,
+    toneMapped: false,
+  });
+
   const sunMesh = new THREE.Mesh(
     new THREE.SphereGeometry(58, 96, 96),
-    new THREE.MeshBasicMaterial({ map: T.sun, color: 0xfff3d0, fog: false })
+    sunMaterial
   );
   sunMesh.position.copy(sunPos);
+  sunMesh.renderOrder = 3;
   scene.add(sunMesh);
 
   // Smooth solar glow using layered sprites instead of hard concentric shells.
@@ -695,7 +1244,7 @@ function buildScene() {
     map: flareSprite,
     color: 0xffcf96,
     transparent: true,
-    opacity: 0.18,
+    opacity: 0.28,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     fog: false,
@@ -708,7 +1257,7 @@ function buildScene() {
     map: flareSprite,
     color: 0xff9340,
     transparent: true,
-    opacity: 0.075,
+    opacity: 0.095,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     fog: false,
@@ -721,7 +1270,7 @@ function buildScene() {
     map: flareSprite,
     color: 0xff6f24,
     transparent: true,
-    opacity: 0.026,
+    opacity: 0.035,
     blending: THREE.AdditiveBlending,
     depthWrite: false,
     fog: false,
@@ -747,49 +1296,49 @@ function buildScene() {
   const projects = [
     {
       id:'NGC-001', name:'gaiatools', type:'planeta oceanico', colorHex:'#9ccfff',
-      pos: new THREE.Vector3(120, 8, -200), radius:14,
+      pos: new THREE.Vector3(-330, 24, -260), radius:14,
       tex: T.neptune, atmoColor: new THREE.Color(0x8fc8ff),
-      hasClouds: true, hasSpecular: true, roughness:0.42, clearcoat:0.28, cloudOpacity:0.2, bumpScale:0.02,
+      hasClouds: true, hasSpecular: true, roughness:0.42, clearcoat:0.28, cloudOpacity:0.2, bumpScale:0.02, visibleBoost:0.48, albedoOverlay:0.36,
       tags:['Python','PyPI','HDBSCAN','Plotly'],
       desc:'Python library para ESA Gaia DR3. Publicado en PyPI con HDBSCAN clustering y visualizaciones interactivas.', noLink:false
     },
     {
       id:'NGC-002', name:'Robot bombero', type:'cuerpo rocoso', colorHex:'#d99a76',
-      pos: new THREE.Vector3(-140, -15, -180), radius:10, hasRing:true,
+      pos: new THREE.Vector3(-95, -34, -95), radius:10, hasRing:true,
       tex: T.mars, atmoColor: new THREE.Color(0xd99a76),
-      roughness:0.96, bumpScale:0.16, terminatorStrength:0.42,
+      roughness:0.96, bumpScale:0.16, terminatorStrength:0.025, visibleBoost:0.44, albedoOverlay:0.34,
       tags:['AVR Assembly','ATmega2560','C'],
       desc:'Maquina de 4 estados en AVR assembly puro. Deteccion de llama y extincion autonoma.', noLink:false
     },
     {
       id:'NGC-003', name:'Braingeneers', type:'gigante gaseoso', colorHex:'#f2d1a3',
-      pos: new THREE.Vector3(60, 30, -380), radius:22,
+      pos: new THREE.Vector3(190, 58, -430), radius:22,
       tex: T.jupiter, atmoColor: new THREE.Color(0xffdfb0),
-      hasClouds: true, roughness:0.72, cloudOpacity:0.1, bumpScale:0.0, terminatorStrength:0.28,
+      hasClouds: true, roughness:0.72, cloudOpacity:0.1, bumpScale:0.0, terminatorStrength:0.025, visibleBoost:0.40, albedoOverlay:0.30,
       tags:['PyTorch','MNE-Python','AWS'],
       desc:'Deep learning en redes neuronales emergentes. UC Santa Cruz - verano 2026.', noLink:true
     },
     {
       id:'NGC-004', name:'DBSCAN paralelo', type:'planeta anillado', colorHex:'#e4c397',
-      pos: new THREE.Vector3(220, -20, 120), radius:11, hasSaturnRing:true,
+      pos: new THREE.Vector3(465, -16, -175), radius:11, hasSaturnRing:true,
       tex: T.saturn, atmoColor: new THREE.Color(0xeed8b8), ringTex: T.ring,
-      roughness:0.8, bumpScale:0.0, terminatorStrength:0.34,
+      roughness:0.8, bumpScale:0.0, terminatorStrength:0.025, visibleBoost:0.44, albedoOverlay:0.34,
       tags:['C++','OpenMP','MPI'],
       desc:'Implementacion paralela de DBSCAN. 2x speedup con 900k+ registros.', noLink:false
     },
     {
       id:'NGC-005', name:'1er lugar LIDERA', type:'mundo volcanico', colorHex:'#e8b482',
-      pos: new THREE.Vector3(-200, 25, 150), radius:13,
+      pos: new THREE.Vector3(735, 32, -20), radius:13,
       tex: T.venus, atmoColor: new THREE.Color(0xe1b27f),
-      hasClouds: true, roughness:0.98, cloudOpacity:0.28, bumpScale:0.1, terminatorStrength:0.45,
+      hasClouds: true, roughness:0.98, cloudOpacity:0.28, bumpScale:0.1, terminatorStrength:0.025, visibleBoost:0.48, albedoOverlay:0.36,
       tags:['Robotica','Liderazgo','2022'],
       desc:'Lider del equipo Anahuac en premio LIDERA. 1er lugar nacional de robotica 2022.', noLink:true
     },
     {
       id:'NGC-006', name:'UPF Barcelona', type:'gigante helado', colorHex:'#a6ddd8',
-      pos: new THREE.Vector3(-80, 40, -420), radius:16,
+      pos: new THREE.Vector3(980, -24, -360), radius:16,
       tex: T.uranus, atmoColor: new THREE.Color(0xa8e3df),
-      hasClouds: true, hasSpecular: true, roughness:0.55, clearcoat:0.18, cloudOpacity:0.16, bumpScale:0.0,
+      hasClouds: true, hasSpecular: true, roughness:0.55, clearcoat:0.18, cloudOpacity:0.16, bumpScale:0.0, visibleBoost:0.46, albedoOverlay:0.34,
       tags:['ML','Deep Learning','Erasmus'],
       desc:'Semestre de intercambio en Universitat Pompeu Fabra, Barcelona. Primavera 2024.', noLink:true
     },
@@ -803,6 +1352,10 @@ function buildScene() {
       map: p.tex,
       roughness: p.roughness ?? 0.82,
       metalness: 0.0,
+      // Texture-based visibility floor: keeps planets readable even when backlit.
+      emissive: new THREE.Color(0xffffff),
+      emissiveMap: p.tex,
+      emissiveIntensity: p.visibleBoost ?? 0.46,
     };
     if (p.bumpScale && p.bumpScale > 0) {
       params.bumpMap = p.tex;
@@ -841,6 +1394,10 @@ function buildScene() {
     grp.position.copy(p.pos);
     grp.rotation.z = [0.18,-0.08,0.06,0.25,-0.16,0.12][index] || 0;
 
+    // Correct sun direction for this specific planet.
+    // Using sunPos.normalize() globally made several planets look artificially dark.
+    const localSunDir = sunPos.clone().sub(p.pos).normalize();
+
     // Thin realistic halo. Kept subtle so it reads as atmosphere, not magic glow.
     const atmosphere = new THREE.Mesh(
       new THREE.SphereGeometry(p.radius * 1.075, 96, 96),
@@ -849,10 +1406,10 @@ function buildScene() {
         fragmentShader: atmoFrag,
         uniforms: {
           uColor:    { value: p.atmoColor },
-          uOpacity:  { value: p.hasClouds ? 0.48 : 0.32 },
+          uOpacity:  { value: p.hasClouds ? 0.58 : 0.42 },
           uPower:    { value: p.radius > 18 ? 2.4 : 2.9 },
           uDayBoost: { value: p.hasClouds ? 0.65 : 0.42 },
-          uSunDir:   { value: sunPos.clone().normalize() },
+          uSunDir:   { value: localSunDir },
         },
         transparent: true,
         side: THREE.BackSide,
@@ -871,6 +1428,24 @@ function buildScene() {
     planetMeshes.push(mesh);
     p.surface = mesh;
 
+    // Guaranteed texture visibility layer.
+    // This prevents planets from becoming unreadable silhouettes when backlit.
+    const albedoShell = new THREE.Mesh(
+      new THREE.SphereGeometry(p.radius * 1.004, 96, 96),
+      new THREE.MeshBasicMaterial({
+        map: p.tex,
+        color: 0xffffff,
+        transparent: true,
+        opacity: p.albedoOverlay ?? 0.34,
+        blending: THREE.NormalBlending,
+        depthWrite: false,
+        fog: false,
+      })
+    );
+    albedoShell.userData = { isAlbedoShell: true, speed: (p.spin ?? 0.001) * 0.45 };
+    grp.add(albedoShell);
+    p.albedoShell = albedoShell;
+
     // Adds a more convincing terminator on small planets whose texture can look flat.
     const nightShade = new THREE.Mesh(
       new THREE.SphereGeometry(p.radius * 1.003, 96, 96),
@@ -878,8 +1453,8 @@ function buildScene() {
         vertexShader: terminatorVert,
         fragmentShader: terminatorFrag,
         uniforms: {
-          uSunDir: { value: sunPos.clone().normalize() },
-          uStrength: { value: p.terminatorStrength ?? 0.33 },
+          uSunDir: { value: localSunDir },
+          uStrength: { value: p.terminatorStrength ?? 0.025 },
         },
         transparent: true,
         side: THREE.FrontSide,
@@ -938,7 +1513,7 @@ function buildScene() {
           color: 0xbda083,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.22,
+          opacity: 0.34,
           blending: THREE.NormalBlending,
           depthWrite: false,
           fog: false,
@@ -999,12 +1574,33 @@ function buildScene() {
       document.getElementById('tid').textContent = lookedAt.id + ' - ' + lookedAt.type.toUpperCase();
       tgt.style.opacity = '1';
       xring.classList.add('active');
-      discovered.add(lookedAt.id);
-      document.getElementById('hobj').textContent = discovered.size + ' / 6';
+      if (!discovered.has(lookedAt.id)) {
+        discovered.add(lookedAt.id);
+        document.getElementById('hobj').textContent = discovered.size + ' / 6';
+        showDiscoveryFeedback(lookedAt);
+      } else {
+        document.getElementById('hobj').textContent = discovered.size + ' / 6';
+      }
     } else {
       tgt.style.opacity = '0';
       xring.classList.remove('active');
     }
+  }
+
+  function showDiscoveryFeedback(obj) {
+    const toast = document.getElementById('discovery-toast');
+    const name = document.getElementById('discovery-name');
+    if (!toast || !name) return;
+
+    name.textContent = obj.id + ' · ' + obj.name.toUpperCase();
+    toast.classList.add('on');
+    xring.classList.add('active');
+    playDiscoverySound();
+
+    clearTimeout(showDiscoveryFeedback._timer);
+    showDiscoveryFeedback._timer = setTimeout(() => {
+      toast.classList.remove('on');
+    }, 2200);
   }
 
   // ── POPUP ──────────────────────────────────────────────────────────────
@@ -1034,6 +1630,7 @@ function buildScene() {
     const right = new THREE.Vector3( Math.cos(fy), 0, -Math.sin(fy));
     const up    = new THREE.Vector3(0, 1, 0);
     let moving = false;
+    if (tourActive && (keys['w']||keys['a']||keys['s']||keys['d']||keys['arrowup']||keys['arrowdown']||keys['arrowleft']||keys['arrowright']||keys[' ']||keys['shift'])) setTourActive(false);
     if (keys['w']||keys['arrowup'])    { camera.position.addScaledVector(fwd,    spd*dt); moving=true; }
     if (keys['s']||keys['arrowdown'])  { camera.position.addScaledVector(fwd,   -spd*dt); moving=true; }
     if (keys['a']||keys['arrowleft'])  { camera.position.addScaledVector(right, -spd*dt); moving=true; }
@@ -1044,6 +1641,97 @@ function buildScene() {
     if (!keys[' '] && !keys['shift']) camera.position.y += moving ? Math.sin(bobPhase)*0.18 : 0;
     document.getElementById('sbfill').style.width = (moving ? 80 : 0) + '%';
     document.getElementById('hpos').textContent = 'X:'+camera.position.x.toFixed(0)+' Y:'+camera.position.y.toFixed(0)+' Z:'+camera.position.z.toFixed(0);
+  }
+
+  function setTourActive(active) {
+    tourActive = active;
+    tourTarget = null;
+    tourTransition = null;
+    tourHold = 0;
+
+    const btn = document.getElementById('tour-btn');
+    if (btn) {
+      btn.classList.toggle('active', active);
+      btn.textContent = active ? 'DETENER TOUR' : 'INICIAR TOUR';
+    }
+
+    if (active) {
+      currentTourIndex = 0;
+      startTourTransition();
+      playTourStepSound();
+      document.exitPointerLock?.();
+    }
+  }
+
+  function getTourCameraPose(project) {
+    const target = project.group.position.clone();
+    const offset = new THREE.Vector3(
+      project.radius * 4.4,
+      project.radius * 1.25 + 8,
+      project.radius * 5.2
+    );
+    const pos = target.clone().add(offset);
+    return { pos, target };
+  }
+
+  function startTourTransition() {
+    if (!projects.length) return;
+    const project = projects[currentTourIndex % projects.length];
+    const pose = getTourCameraPose(project);
+
+    tourTarget = project;
+    tourTransition = {
+      fromPos: camera.position.clone(),
+      toPos: pose.pos,
+      fromQuat: camera.quaternion.clone(),
+      toQuat: new THREE.Quaternion(),
+      elapsed: 0,
+      duration: 3.8,
+      target: pose.target,
+    };
+
+    const lookMatrix = new THREE.Matrix4();
+    lookMatrix.lookAt(pose.pos, pose.target, new THREE.Vector3(0,1,0));
+    tourTransition.toQuat.setFromRotationMatrix(lookMatrix);
+
+    showDiscoveryFeedback(project);
+  }
+
+  function updateAutoTour(dt) {
+    if (!tourActive) return;
+
+    if (tourTransition) {
+      tourTransition.elapsed += dt;
+      const t = Math.min(1, tourTransition.elapsed / tourTransition.duration);
+      const ease = t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2) / 2;
+
+      camera.position.lerpVectors(tourTransition.fromPos, tourTransition.toPos, ease);
+      camera.quaternion.slerpQuaternions(tourTransition.fromQuat, tourTransition.toQuat, ease);
+
+      document.getElementById('sbfill').style.width = '35%';
+      document.getElementById('hpos').textContent = 'X:'+camera.position.x.toFixed(0)+' Y:'+camera.position.y.toFixed(0)+' Z:'+camera.position.z.toFixed(0);
+
+      if (t >= 1) {
+        tourTransition = null;
+        tourHold = 4.2;
+      }
+      return;
+    }
+
+    if (tourTarget) {
+      const target = tourTarget.group.position.clone();
+      const lookMatrix = new THREE.Matrix4();
+      lookMatrix.lookAt(camera.position, target, new THREE.Vector3(0,1,0));
+      const q = new THREE.Quaternion().setFromRotationMatrix(lookMatrix);
+      camera.quaternion.slerp(q, 0.035);
+    }
+
+    tourHold -= dt;
+    if (tourHold <= 0) {
+      currentTourIndex = (currentTourIndex + 1) % projects.length;
+      startTourTransition();
+      playTourStepSound();
+    }
   }
 
   // ── SUBTLE SPACECRAFT EASTER EGGS ─────────────────────────────────────
@@ -1372,9 +2060,14 @@ function buildScene() {
     requestAnimationFrame(animate);
     const dt = Math.min(clock.getDelta(), 0.05);
     elapsed += dt;
-    if (gameActive) { updateMovement(dt); checkLookAt(); }
+    if (gameActive) {
+      if (tourActive) updateAutoTour(dt);
+      else updateMovement(dt);
+      checkLookAt();
+    }
     updateTransientCrafts(dt);
     updateShootingStars();
+    updateBlackHoleEvent();
 
     projects.forEach(p => {
       if (!p.group) return;
@@ -1382,6 +2075,7 @@ function buildScene() {
       if (p.surface) p.surface.rotation.y += 0.00045;
       p.group.children.forEach(ch => {
         if (ch.userData?.isClouds) ch.rotation.y += ch.userData.speed;
+        if (ch.userData?.isAlbedoShell) ch.rotation.y += ch.userData.speed;
         if (ch.userData?.isRing) ch.rotation.z += ch.userData.speed;
         if (ch.userData?.isMoonPivot) ch.rotation.y += ch.userData.speed;
       });
@@ -1395,7 +2089,7 @@ function buildScene() {
     });
 
     sunMesh.rotation.y += 0.00032;
-    sunLight.intensity = 74000 + Math.sin(elapsed*0.22)*2600;
+    sunLight.intensity = 220000 + Math.sin(elapsed*0.22)*9000;
     solarCorona.material.opacity = 0.17 + Math.sin(elapsed*0.18)*0.012;
     solarOuterGlow.material.opacity = 0.072 + Math.sin(elapsed*0.12 + 0.6)*0.008;
     solarFarGlow.material.opacity = 0.024 + Math.sin(elapsed*0.09 + 1.3)*0.004;
@@ -1403,10 +2097,20 @@ function buildScene() {
     composer.render();
   }
 
+  document.getElementById('audio-btn')?.addEventListener('click', () => {
+    setAudioEnabled(!audioEnabled);
+  });
+
+  document.getElementById('tour-btn')?.addEventListener('click', () => {
+    if (!gameActive) return;
+    setTourActive(!tourActive);
+  });
+
   document.getElementById('startBtn').addEventListener('click', () => {
     const ctrl = document.getElementById('ctrl');
+    setAudioEnabled(audioEnabled);
     ctrl.style.opacity = '0';
-    setTimeout(() => { ctrl.style.display='none'; gameActive=true; renderer.domElement.requestPointerLock(); setTimeout(spawnCinematicFlyby, 6500); }, 500);
+    setTimeout(() => { ctrl.style.display='none'; gameActive=true; blackHoleGameActive=true; renderer.domElement.requestPointerLock(); setTimeout(spawnCinematicFlyby, 6500); }, 500);
   });
 
   animate();
