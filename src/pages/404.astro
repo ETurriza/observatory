@@ -47,8 +47,16 @@
       <h1>404</h1>
       <h2>SIGNAL LOST BEYOND EVENT HORIZON</h2>
       <p>La ruta solicitada cruzó el horizonte de eventos. La navegación automática no puede recuperar la señal desde esta coordenada.</p>
-      <a href="/">REGRESAR AL OBSERVATORIO</a>
+      <a id="return-observatory" href="/observatory/">REGRESAR AL OBSERVATORIO</a>
     </section>
   </main>
+
+  <script>
+    document.getElementById('return-observatory')?.addEventListener('click', (event) => {
+      event.preventDefault();
+      window.location.assign('/observatory/');
+    });
+  </script>
+
 </body>
 </html>
