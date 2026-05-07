@@ -612,6 +612,12 @@ const observerFill = new THREE.DirectionalLight(0x8fb3d8, 0.72);
 observerFill.position.set(-0.35, 0.22, 1.0).normalize();
 scene.add(observerFill);
 
+// Soft headlamp-style fill. It follows the camera and prevents planets from becoming pure silhouettes.
+const cameraFill = new THREE.PointLight(0xbfdcff, 18, 520, 1.8);
+cameraFill.position.set(0, 0, 0);
+camera.add(cameraFill);
+scene.add(camera);
+
 // ── TEXTURE LOADER ─────────────────────────────────────────────────────────
 const loader = new THREE.TextureLoader();
 let loaded = 0;
@@ -1292,7 +1298,7 @@ function buildScene() {
       id:'NGC-001', name:'gaiatools', type:'planeta oceanico', colorHex:'#9ccfff',
       pos: new THREE.Vector3(-330, 24, -260), radius:14,
       tex: T.neptune, atmoColor: new THREE.Color(0x8fc8ff),
-      hasClouds: true, hasSpecular: true, roughness:0.42, clearcoat:0.28, cloudOpacity:0.2, bumpScale:0.02,
+      hasClouds: true, hasSpecular: true, roughness:0.42, clearcoat:0.28, cloudOpacity:0.2, bumpScale:0.02, visibleBoost:0.34,
       tags:['Python','PyPI','HDBSCAN','Plotly'],
       desc:'Python library para ESA Gaia DR3. Publicado en PyPI con HDBSCAN clustering y visualizaciones interactivas.', noLink:false
     },
@@ -1300,7 +1306,7 @@ function buildScene() {
       id:'NGC-002', name:'Robot bombero', type:'cuerpo rocoso', colorHex:'#d99a76',
       pos: new THREE.Vector3(-95, -34, -95), radius:10, hasRing:true,
       tex: T.mars, atmoColor: new THREE.Color(0xd99a76),
-      roughness:0.96, bumpScale:0.16, terminatorStrength:0.24,
+      roughness:0.96, bumpScale:0.16, terminatorStrength:0.09, visibleBoost:0.30,
       tags:['AVR Assembly','ATmega2560','C'],
       desc:'Maquina de 4 estados en AVR assembly puro. Deteccion de llama y extincion autonoma.', noLink:false
     },
@@ -1308,7 +1314,7 @@ function buildScene() {
       id:'NGC-003', name:'Braingeneers', type:'gigante gaseoso', colorHex:'#f2d1a3',
       pos: new THREE.Vector3(190, 58, -430), radius:22,
       tex: T.jupiter, atmoColor: new THREE.Color(0xffdfb0),
-      hasClouds: true, roughness:0.72, cloudOpacity:0.1, bumpScale:0.0, terminatorStrength:0.18,
+      hasClouds: true, roughness:0.72, cloudOpacity:0.1, bumpScale:0.0, terminatorStrength:0.07, visibleBoost:0.26,
       tags:['PyTorch','MNE-Python','AWS'],
       desc:'Deep learning en redes neuronales emergentes. UC Santa Cruz - verano 2026.', noLink:true
     },
@@ -1316,7 +1322,7 @@ function buildScene() {
       id:'NGC-004', name:'DBSCAN paralelo', type:'planeta anillado', colorHex:'#e4c397',
       pos: new THREE.Vector3(465, -16, -175), radius:11, hasSaturnRing:true,
       tex: T.saturn, atmoColor: new THREE.Color(0xeed8b8), ringTex: T.ring,
-      roughness:0.8, bumpScale:0.0, terminatorStrength:0.20,
+      roughness:0.8, bumpScale:0.0, terminatorStrength:0.08, visibleBoost:0.30,
       tags:['C++','OpenMP','MPI'],
       desc:'Implementacion paralela de DBSCAN. 2x speedup con 900k+ registros.', noLink:false
     },
@@ -1324,7 +1330,7 @@ function buildScene() {
       id:'NGC-005', name:'1er lugar LIDERA', type:'mundo volcanico', colorHex:'#e8b482',
       pos: new THREE.Vector3(735, 32, -20), radius:13,
       tex: T.venus, atmoColor: new THREE.Color(0xe1b27f),
-      hasClouds: true, roughness:0.98, cloudOpacity:0.28, bumpScale:0.1, terminatorStrength:0.26,
+      hasClouds: true, roughness:0.98, cloudOpacity:0.28, bumpScale:0.1, terminatorStrength:0.10, visibleBoost:0.34,
       tags:['Robotica','Liderazgo','2022'],
       desc:'Lider del equipo Anahuac en premio LIDERA. 1er lugar nacional de robotica 2022.', noLink:true
     },
@@ -1332,7 +1338,7 @@ function buildScene() {
       id:'NGC-006', name:'UPF Barcelona', type:'gigante helado', colorHex:'#a6ddd8',
       pos: new THREE.Vector3(980, -24, -360), radius:16,
       tex: T.uranus, atmoColor: new THREE.Color(0xa8e3df),
-      hasClouds: true, hasSpecular: true, roughness:0.55, clearcoat:0.18, cloudOpacity:0.16, bumpScale:0.0,
+      hasClouds: true, hasSpecular: true, roughness:0.55, clearcoat:0.18, cloudOpacity:0.16, bumpScale:0.0, visibleBoost:0.32,
       tags:['ML','Deep Learning','Erasmus'],
       desc:'Semestre de intercambio en Universitat Pompeu Fabra, Barcelona. Primavera 2024.', noLink:true
     },
@@ -1346,8 +1352,10 @@ function buildScene() {
       map: p.tex,
       roughness: p.roughness ?? 0.82,
       metalness: 0.0,
-      emissive: new THREE.Color(0x07090d),
-      emissiveIntensity: 0.16,
+      // Texture-based visibility floor: keeps planets readable even when backlit.
+      emissive: new THREE.Color(0xffffff),
+      emissiveMap: p.tex,
+      emissiveIntensity: p.visibleBoost ?? 0.32,
     };
     if (p.bumpScale && p.bumpScale > 0) {
       params.bumpMap = p.tex;
@@ -1394,7 +1402,7 @@ function buildScene() {
         fragmentShader: atmoFrag,
         uniforms: {
           uColor:    { value: p.atmoColor },
-          uOpacity:  { value: p.hasClouds ? 0.48 : 0.32 },
+          uOpacity:  { value: p.hasClouds ? 0.58 : 0.42 },
           uPower:    { value: p.radius > 18 ? 2.4 : 2.9 },
           uDayBoost: { value: p.hasClouds ? 0.65 : 0.42 },
           uSunDir:   { value: sunPos.clone().normalize() },
@@ -1424,7 +1432,7 @@ function buildScene() {
         fragmentShader: terminatorFrag,
         uniforms: {
           uSunDir: { value: sunPos.clone().normalize() },
-          uStrength: { value: p.terminatorStrength ?? 0.20 },
+          uStrength: { value: p.terminatorStrength ?? 0.08 },
         },
         transparent: true,
         side: THREE.FrontSide,
@@ -1483,7 +1491,7 @@ function buildScene() {
           color: 0xbda083,
           side: THREE.DoubleSide,
           transparent: true,
-          opacity: 0.22,
+          opacity: 0.34,
           blending: THREE.NormalBlending,
           depthWrite: false,
           fog: false,
