@@ -1240,7 +1240,7 @@ function buildScene() {
       tex: T.neptune, atmoColor: new THREE.Color(0x8fc8ff),
       hasClouds: true, hasSpecular: true, roughness:0.42, clearcoat:0.28, cloudOpacity:0.2, bumpScale:0.02,
       tags:['Python','PyPI','HDBSCAN','Plotly'],
-      desc:'Libreria de Python publicada en PyPI para consultar y analizar el catalogo estelar ESA Gaia DR3. Incluye clustering con HDBSCAN, diagramas Hertzsprung-Russell interactivos con Plotly, crossmatching con el NASA Exoplanet Archive, soporte Docker y CI/CD con GitHub Actions.', noLink:false
+      desc:'Libreria de Python publicada en PyPI para consultar y analizar el catalogo estelar ESA Gaia DR3. Incluye clustering con HDBSCAN, diagramas Hertzsprung-Russell interactivos con Plotly, crossmatching con el NASA Exoplanet Archive, soporte Docker y CI/CD con GitHub Actions.', noLink:false, url:'https://github.com/ETurriza/gaiatools', buttonLabel:'VER EN GITHUB'
     },
     {
       id:'NGC-002', name:'Robot bombero', type:'cuerpo rocoso', colorHex:'#d99a76',
@@ -1248,7 +1248,7 @@ function buildScene() {
       tex: T.mars, atmoColor: new THREE.Color(0xd99a76),
       roughness:0.96, bumpScale:0.16, terminatorStrength:0.42,
       tags:['AVR Assembly','ATmega2560','C'],
-      desc:'Robot autonomo programado en AVR assembly puro para el microcontrolador ATmega2560. Implementa una maquina de 4 estados: seguimiento de linea con sensores TCRT5000, deteccion de llama con fotoresistores, identificacion de base por color con sensor TCS230, y extincion con bomba de agua controlada por servo.', noLink:false
+      desc:'Robot autonomo programado en AVR assembly puro para el microcontrolador ATmega2560. Implementa una maquina de 4 estados: seguimiento de linea con sensores TCRT5000, deteccion de llama con fotoresistores, identificacion de base por color con sensor TCS230, y extincion con bomba de agua controlada por servo.', noLink:false, url:'https://github.com/ETurriza/firefighter-robot', buttonLabel:'VER EN GITHUB'
     },
     {
       id:'NGC-003', name:'Braingeneers', type:'gigante gaseoso', colorHex:'#f2d1a3',
@@ -1256,7 +1256,7 @@ function buildScene() {
       tex: T.jupiter, atmoColor: new THREE.Color(0xffdfb0),
       hasClouds: true, roughness:0.72, cloudOpacity:0.1, bumpScale:0.0, terminatorStrength:0.28,
       tags:['PyTorch','MNE-Python','AWS'],
-      desc:'Investigacion en el Braingeneers Lab de UC Santa Cruz (verano 2026). Aplica deep learning para caracterizar redes neuronales emergentes usando datos de electrofisiologia. Trabajo bajo Hunter Schweiger con sponsorship de Mohammed Mostajo-Radji y Mircea Teodorescu. Parte del programa ISRP.', noLink:true
+      desc:'Investigacion en el Braingeneers Lab de UC Santa Cruz (verano 2026). Aplica deep learning para caracterizar redes neuronales emergentes usando datos de electrofisiologia. Trabajo bajo Hunter Schweiger con sponsorship de Mohammed Mostajo-Radji y Mircea Teodorescu. Parte del programa ISRP.', noLink:false, url:'https://braingeneers.ucsc.edu/', buttonLabel:'VER SITIO WEB'
     },
     {
       id:'NGC-004', name:'DBSCAN paralelo', type:'planeta anillado', colorHex:'#e4c397',
@@ -1264,7 +1264,7 @@ function buildScene() {
       tex: T.saturn, atmoColor: new THREE.Color(0xeed8b8), ringTex: T.ring,
       roughness:0.8, bumpScale:0.0, terminatorStrength:0.34,
       tags:['C++','OpenMP','MPI'],
-      desc:'Implementacion del algoritmo DBSCAN desde cero en C++, paralelizado con OpenMP. Logra un speedup de 2.0x sobre la version serial procesando mas de 900,000 registros del dataset de crimenes del LAPD. Incluye analisis de escalabilidad y version distribuida con MPI.', noLink:false
+      desc:'Implementacion del algoritmo DBSCAN desde cero en C++, paralelizado con OpenMP. Logra un speedup de 2.0x sobre la version serial procesando mas de 900,000 registros del dataset de crimenes del LAPD. Incluye analisis de escalabilidad y version distribuida con MPI.', noLink:true
     },
     {
       id:'NGC-005', name:'1er lugar LIDERA', type:'mundo volcanico', colorHex:'#e8b482',
@@ -1744,7 +1744,7 @@ function buildScene() {
     footer.style.cssText = 'display:flex;justify-content:flex-end;margin-top:18px';
 
     const githubBtn = document.createElement('button');
-    githubBtn.textContent = 'VER EN GITHUB';
+    githubBtn.textContent = obj.buttonLabel || 'VER EN GITHUB';
     githubBtn.style.cssText = [
       'font-size:9px',
       'padding:7px 13px',
@@ -1761,7 +1761,9 @@ function buildScene() {
       if (!obj.noLink && obj.url) window.open(obj.url, '_blank', 'noopener,noreferrer');
     });
 
-    footer.appendChild(githubBtn);
+    if (!obj.noLink) {
+      footer.appendChild(githubBtn);
+    }
 
     modal.appendChild(close);
     modal.appendChild(id);
