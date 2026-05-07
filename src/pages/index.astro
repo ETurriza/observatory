@@ -224,6 +224,22 @@ const DEPLOY_BASE = (() => {
 const BASE = DEPLOY_BASE + 'textures/';
 const ROUTE_BASE = DEPLOY_BASE;
 
+function getCurrentPageBasePath() {
+  const path = window.location.pathname;
+
+  if (path.endsWith('/')) return path;
+
+  // If the current URL is /observatory with no trailing slash, treat it as a directory.
+  if (!/\.[^/]+$/.test(path)) return path + '/';
+
+  // If the current URL is /observatory/index.html, use /observatory/.
+  return path.slice(0, path.lastIndexOf('/') + 1);
+}
+
+function goToLocal404() {
+  window.location.assign(getCurrentPageBasePath() + '404.html');
+}
+
 // ── HIGH QUALITY HELPERS ──────────────────────────────────────────────────
 function initAudioEngine() {
   if (audioEngine) return audioEngine;
@@ -1069,7 +1085,7 @@ function updateBlackHoleEvent() {
     const loss = document.getElementById('signal-loss');
     if (loss) loss.classList.add('on');
     setTimeout(() => {
-      window.location.href = ROUTE_BASE + '404.html';
+      goToLocal404();
     }, 1700);
   }
 }
