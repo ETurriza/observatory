@@ -79,14 +79,14 @@
     .ctrl-hints span{color:rgba(169,217,244,.58)}
     .start-btn{padding:10px 28px;background:rgba(169,217,244,.07);border:0.5px solid rgba(169,217,244,.36);border-radius:7px;color:#dff4ff;font-family:'JetBrains Mono',monospace;font-size:11px;cursor:pointer;letter-spacing:.12em;transition:background .2s,box-shadow .2s}
     .start-btn:hover{background:rgba(169,217,244,.14);box-shadow:0 0 18px rgba(169,217,244,.1)}
-    .popup{position:absolute;z-index:30;background:linear-gradient(180deg,rgba(7,11,18,.94),rgba(1,3,8,.96));border:0.5px solid rgba(169,217,244,.25);border-radius:10px;padding:16px 18px;width:260px;pointer-events:auto;backdrop-filter:blur(12px);animation:popIn .22s ease;box-shadow:0 28px 80px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.045)}
+    .popup{position:absolute;z-index:30;background:linear-gradient(180deg,rgba(7,11,18,.94),rgba(1,3,8,.96));border:0.5px solid rgba(169,217,244,.25);border-radius:10px;padding:18px 20px;width:min(360px,calc(100vw - 42px));max-height:72vh;overflow-y:auto;pointer-events:auto;backdrop-filter:blur(12px);animation:popIn .22s ease;box-shadow:0 28px 80px rgba(0,0,0,.55), inset 0 1px rgba(255,255,255,.045)}
     @keyframes popIn{from{opacity:0;transform:translate(-50%,-50%) scale(.94)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
     .p-close{position:absolute;top:10px;right:12px;background:none;border:none;color:rgba(255,255,255,.25);cursor:pointer;font-size:12px;font-family:'JetBrains Mono',monospace}
     .p-close:hover{color:#fff}
     .p-id{font-size:8px;color:rgba(169,217,244,.42);letter-spacing:.14em;margin-bottom:4px}
     .p-name{font-size:15px;font-weight:500;font-family:'Space Grotesk',sans-serif;color:#fff;margin-bottom:4px}
     .p-type{display:inline-block;font-size:8px;padding:2px 8px;border-radius:5px;border:0.5px solid;margin-bottom:8px}
-    .p-desc{font-size:11px;color:rgba(255,255,255,.48);line-height:1.65;margin-bottom:9px}
+    .p-desc{font-size:11px;color:rgba(255,255,255,.58);line-height:1.72;margin-bottom:11px}
     .p-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:10px}
     .p-tag{font-size:8px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.045);border:0.5px solid rgba(255,255,255,.08);color:rgba(255,255,255,.34)}
     .p-btn{font-size:9px;padding:5px 12px;border-radius:5px;border:0.5px solid;background:transparent;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:background .2s}
@@ -1240,7 +1240,7 @@ function buildScene() {
       tex: T.neptune, atmoColor: new THREE.Color(0x8fc8ff),
       hasClouds: true, hasSpecular: true, roughness:0.42, clearcoat:0.28, cloudOpacity:0.2, bumpScale:0.02,
       tags:['Python','PyPI','HDBSCAN','Plotly'],
-      desc:'Python library para ESA Gaia DR3. Publicado en PyPI con HDBSCAN clustering y visualizaciones interactivas.', noLink:false
+      desc:'Libreria de Python publicada en PyPI para consultar y analizar el catalogo estelar ESA Gaia DR3. Incluye clustering con HDBSCAN, diagramas Hertzsprung-Russell interactivos con Plotly, crossmatching con el NASA Exoplanet Archive, soporte Docker y CI/CD con GitHub Actions.', noLink:false
     },
     {
       id:'NGC-002', name:'Robot bombero', type:'cuerpo rocoso', colorHex:'#d99a76',
@@ -1248,7 +1248,7 @@ function buildScene() {
       tex: T.mars, atmoColor: new THREE.Color(0xd99a76),
       roughness:0.96, bumpScale:0.16, terminatorStrength:0.42,
       tags:['AVR Assembly','ATmega2560','C'],
-      desc:'Maquina de 4 estados en AVR assembly puro. Deteccion de llama y extincion autonoma.', noLink:false
+      desc:'Robot autonomo programado en AVR assembly puro para el microcontrolador ATmega2560. Implementa una maquina de 4 estados: seguimiento de linea con sensores TCRT5000, deteccion de llama con fotoresistores, identificacion de base por color con sensor TCS230, y extincion con bomba de agua controlada por servo.', noLink:false
     },
     {
       id:'NGC-003', name:'Braingeneers', type:'gigante gaseoso', colorHex:'#f2d1a3',
@@ -1256,7 +1256,7 @@ function buildScene() {
       tex: T.jupiter, atmoColor: new THREE.Color(0xffdfb0),
       hasClouds: true, roughness:0.72, cloudOpacity:0.1, bumpScale:0.0, terminatorStrength:0.28,
       tags:['PyTorch','MNE-Python','AWS'],
-      desc:'Deep learning en redes neuronales emergentes. UC Santa Cruz - verano 2026.', noLink:true
+      desc:'Investigacion en el Braingeneers Lab de UC Santa Cruz (verano 2026). Aplica deep learning para caracterizar redes neuronales emergentes usando datos de electrofisiologia. Trabajo bajo Hunter Schweiger con sponsorship de Mohammed Mostajo-Radji y Mircea Teodorescu. Parte del programa ISRP.', noLink:true
     },
     {
       id:'NGC-004', name:'DBSCAN paralelo', type:'planeta anillado', colorHex:'#e4c397',
@@ -1264,7 +1264,7 @@ function buildScene() {
       tex: T.saturn, atmoColor: new THREE.Color(0xeed8b8), ringTex: T.ring,
       roughness:0.8, bumpScale:0.0, terminatorStrength:0.34,
       tags:['C++','OpenMP','MPI'],
-      desc:'Implementacion paralela de DBSCAN. 2x speedup con 900k+ registros.', noLink:false
+      desc:'Implementacion del algoritmo DBSCAN desde cero en C++, paralelizado con OpenMP. Logra un speedup de 2.0x sobre la version serial procesando mas de 900,000 registros del dataset de crimenes del LAPD. Incluye analisis de escalabilidad y version distribuida con MPI.', noLink:false
     },
     {
       id:'NGC-005', name:'1er lugar LIDERA', type:'mundo volcanico', colorHex:'#e8b482',
@@ -1272,7 +1272,7 @@ function buildScene() {
       tex: T.venus, atmoColor: new THREE.Color(0xe1b27f),
       hasClouds: true, roughness:0.98, cloudOpacity:0.28, bumpScale:0.1, terminatorStrength:0.45,
       tags:['Robotica','Liderazgo','2022'],
-      desc:'Lider del equipo Anahuac en premio LIDERA. 1er lugar nacional de robotica 2022.', noLink:true
+      desc:'Lider del equipo de robotica del Anahuac en el premio LIDERA 2022. Primer lugar en la competencia nacional. Coordino el diseno mecanico, electronico y de software del robot, llevando al equipo desde la fase regional hasta la victoria en la final nacional.', noLink:true
     },
     {
       id:'NGC-006', name:'UPF Barcelona', type:'gigante helado', colorHex:'#a6ddd8',
@@ -1280,7 +1280,7 @@ function buildScene() {
       tex: T.uranus, atmoColor: new THREE.Color(0xa8e3df),
       hasClouds: true, hasSpecular: true, roughness:0.55, clearcoat:0.18, cloudOpacity:0.16, bumpScale:0.0,
       tags:['ML','Deep Learning','Erasmus'],
-      desc:'Semestre de intercambio en Universitat Pompeu Fabra, Barcelona. Primavera 2024.', noLink:true
+      desc:'Semestre de intercambio en la Universitat Pompeu Fabra, Barcelona, primavera 2024. Coursework en Machine Learning, Deep Learning y Computer Graphics. Primera experiencia academica internacional, combinando ingenieria con perspectiva europea en tecnologia.', noLink:true
     },
   ];
 
@@ -1359,6 +1359,22 @@ function buildScene() {
     grp.add(mesh);
     planetMeshes.push(mesh);
     p.surface = mesh;
+
+    // Invisible interaction shell. This makes aiming at planets much less pixel-perfect.
+    const hitSphere = new THREE.Mesh(
+      new THREE.SphereGeometry(p.radius * 1.42, 32, 32),
+      new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        depthWrite: false,
+        fog: false,
+      })
+    );
+    hitSphere.userData = p;
+    hitSphere.renderOrder = -1;
+    grp.add(hitSphere);
+    planetMeshes.push(hitSphere);
+    p.hitSphere = hitSphere;
 
     // Adds a more convincing terminator on small planets whose texture can look flat.
     const nightShade = new THREE.Mesh(
@@ -1455,9 +1471,19 @@ function buildScene() {
   let lookedAt = null;
 
   document.addEventListener('keydown', e => {
-    keys[e.key.toLowerCase()] = true;
-    if (e.key.toLowerCase() === 'e' && lookedAt) { e.preventDefault(); openPopup(lookedAt); }
-    if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(e.key.toLowerCase())) e.preventDefault();
+    const key = e.key.toLowerCase();
+    keys[key] = true;
+
+    if (key === 'e') {
+      const target = lookedAt || getLookTarget();
+      if (target) {
+        e.preventDefault();
+        lookedAt = target;
+        openPopup(target);
+      }
+    }
+
+    if (['w','a','s','d','arrowup','arrowdown','arrowleft','arrowright',' '].includes(key)) e.preventDefault();
   });
   document.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
   renderer.domElement.addEventListener('click', () => { if (gameActive) renderer.domElement.requestPointerLock(); });
@@ -1477,17 +1503,67 @@ function buildScene() {
   const raycaster = new THREE.Raycaster();
   const center = new THREE.Vector2(0, 0);
 
-  function checkLookAt() {
+  function getLookTarget() {
+    // 1) Exact raycast against visible planet meshes and invisible interaction shells.
     raycaster.setFromCamera(center, camera);
-    const hits = raycaster.intersectObjects(planetMeshes);
-    lookedAt = hits.length > 0 ? hits[0].object.userData : null;
+    const hits = raycaster.intersectObjects(planetMeshes, false);
+    if (hits.length > 0) return hits[0].object.userData;
+
+    // 2) Fallback: screen-space detection around the planet center.
+    // This makes the E interaction reliable even when the crosshair is over atmosphere/rings/glow.
+    let best = null;
+    let bestScore = Infinity;
+
+    for (const p of projects) {
+      if (!p.group) continue;
+
+      const world = new THREE.Vector3();
+      p.group.getWorldPosition(world);
+
+      const toObj = world.clone().sub(camera.position);
+      const distance = toObj.length();
+      if (distance <= 0.001) continue;
+
+      const forward = new THREE.Vector3();
+      camera.getWorldDirection(forward);
+      if (forward.dot(toObj.normalize()) <= 0) continue;
+
+      const screen = world.clone().project(camera);
+      if (screen.z < -1 || screen.z > 1) continue;
+
+      const dx = screen.x;
+      const dy = screen.y;
+      const screenDist = Math.sqrt(dx * dx + dy * dy);
+
+      const apparentRadius = Math.max(
+        0.035,
+        Math.min(0.14, (p.radius * 1.9) / Math.max(distance, 1))
+      );
+
+      if (screenDist <= apparentRadius) {
+        const score = screenDist + distance * 0.00008;
+        if (score < bestScore) {
+          bestScore = score;
+          best = p;
+        }
+      }
+    }
+
+    return best;
+  }
+
+  function checkLookAt() {
+    lookedAt = getLookTarget();
+
     const tgt = document.getElementById('tgt');
     const xring = document.getElementById('xring');
+
     if (lookedAt) {
       document.getElementById('tname').textContent = lookedAt.name;
       document.getElementById('tid').textContent = lookedAt.id + ' - ' + lookedAt.type.toUpperCase();
       tgt.style.opacity = '1';
       xring.classList.add('active');
+
       if (!discovered.has(lookedAt.id)) {
         discovered.add(lookedAt.id);
         document.getElementById('hobj').textContent = discovered.size + ' / 6';
@@ -1508,7 +1584,7 @@ function buildScene() {
 
     name.textContent = obj.id + ' · ' + obj.name.toUpperCase();
     toast.classList.add('on');
-    xring.classList.add('active');
+    document.getElementById('xring')?.classList.add('active');
     playDiscoverySound();
 
     clearTimeout(showDiscoveryFeedback._timer);
@@ -1520,6 +1596,14 @@ function buildScene() {
   // ── POPUP ──────────────────────────────────────────────────────────────
   let activePopup = null;
   function closePopup() { document.querySelector('.popup')?.remove(); activePopup = null; }
+  function escapeHTML(value) {
+    return String(value)
+      .replaceAll('&', '&amp;')
+      .replaceAll('<', '&lt;')
+      .replaceAll('>', '&gt;')
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", '&#039;');
+  }
   function openPopup(obj) {
     closePopup(); activePopup = obj; document.exitPointerLock();
     const el = document.createElement('div');
@@ -1530,7 +1614,7 @@ function buildScene() {
       '<div class="p-id">' + obj.id + '</div>' +
       '<div class="p-name">' + obj.name + '</div>' +
       '<span class="p-type" style="color:'+obj.colorHex+';background:'+obj.colorHex+'18;border-color:'+obj.colorHex+'40">'+obj.type+'</span>' +
-      '<div class="p-desc">' + obj.desc + '</div>' +
+      '<div class="p-desc">' + escapeHTML(obj.desc) + '</div>' +
       '<div class="p-tags">' + obj.tags.map(t => '<span class="p-tag">'+t+'</span>').join('') + '</div>' +
       (!obj.noLink ? '<button class="p-btn" style="color:'+obj.colorHex+';border-color:'+obj.colorHex+'50">ver en GitHub</button>' : '');
     document.getElementById('container').appendChild(el);
