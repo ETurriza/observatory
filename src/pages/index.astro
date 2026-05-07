@@ -488,6 +488,73 @@ const terminatorVert = `
   }
 `;
 
+
+const sunVert = `
+  varying vec2 vUv;
+  varying vec3 vNormal;
+  void main() {
+    vUv = uv;
+    vNormal = normalize(normalMatrix * normal);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`;
+
+const sunFrag = `
+  uniform float uTime;
+  varying vec2 vUv;
+  varying vec3 vNormal;
+
+  float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+  }
+
+  float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    vec2 u = f * f * (3.0 - 2.0 * f);
+
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+  }
+
+  float fbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.55;
+    for (int i = 0; i < 5; i++) {
+      v += a * noise(p);
+      p *= 2.05;
+      a *= 0.5;
+    }
+    return v;
+  }
+
+  void main() {
+    vec2 uv = vUv;
+    vec2 p = uv * 7.5;
+    float plasma = fbm(p + vec2(uTime * 0.025, -uTime * 0.018));
+    float cells = fbm(p * 2.2 + vec2(-uTime * 0.035, uTime * 0.02));
+
+    float limb = pow(max(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0)), 0.0), 0.24);
+    float hot = smoothstep(0.48, 0.96, plasma + cells * 0.28);
+
+    vec3 deepOrange = vec3(1.0, 0.28, 0.04);
+    vec3 orange = vec3(1.0, 0.54, 0.13);
+    vec3 yellow = vec3(1.0, 0.86, 0.34);
+    vec3 whiteHot = vec3(1.0, 0.96, 0.72);
+
+    vec3 col = mix(deepOrange, orange, plasma);
+    col = mix(col, yellow, hot * 0.72);
+    col = mix(col, whiteHot, smoothstep(0.82, 1.12, plasma + cells * 0.38));
+
+    col *= 0.68 + limb * 0.72;
+    gl_FragColor = vec4(col, 1.0);
+  }
+`;
+
 const terminatorFrag = `
   uniform vec3 uSunDir;
   uniform float uStrength;
@@ -570,7 +637,7 @@ composer.addPass(new EffectPass(camera, bloomEffect, hueSatEffect, vignetteEffec
 // ── LIGHTING ───────────────────────────────────────────────────────────────
 scene.add(new THREE.AmbientLight(0x101729, 0.042));
 
-const sunPos = new THREE.Vector3(620, 270, -260);
+const sunPos = new THREE.Vector3(520, 220, -1120);
 const sunLight = new THREE.PointLight(0xfff0d2, 75000, 0, 2);
 sunLight.position.copy(sunPos);
 sunLight.castShadow = true;
@@ -610,7 +677,6 @@ function loadTex(name) {
 
 const T = {
   milkyway: loadTex('8k_stars_milky_way.jpg'),
-  sun:      makeProceduralSunTexture(),
   jupiter:  loadTex('8k_jupiter.jpg'),
   mars:     loadTex('8k_mars.jpg'),
   saturn:   loadTex('8k_saturn.jpg'),
@@ -1195,8 +1261,15 @@ function buildScene() {
 
   // Sun with tight corona and an optical flare plane.
   const sunMesh = new THREE.Mesh(
-    new THREE.SphereGeometry(58, 96, 96),
-    new THREE.MeshBasicMaterial({ map: T.sun, color: 0xfff3d0, fog: false })
+    new THREE.SphereGeometry(78, 128, 128),
+    new THREE.ShaderMaterial({
+      vertexShader: sunVert,
+      fragmentShader: sunFrag,
+      uniforms: {
+        uTime: { value: 0 },
+      },
+      fog: false,
+    })
   );
   sunMesh.position.copy(sunPos);
   scene.add(sunMesh);
@@ -1212,7 +1285,7 @@ function buildScene() {
     fog: false,
   }));
   solarCorona.position.copy(sunMesh.position);
-  solarCorona.scale.set(210, 210, 1);
+  solarCorona.scale.set(290, 290, 1);
   scene.add(solarCorona);
 
   const solarOuterGlow = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -1225,7 +1298,7 @@ function buildScene() {
     fog: false,
   }));
   solarOuterGlow.position.copy(sunMesh.position);
-  solarOuterGlow.scale.set(360, 360, 1);
+  solarOuterGlow.scale.set(480, 480, 1);
   scene.add(solarOuterGlow);
 
   const solarFarGlow = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -1238,7 +1311,7 @@ function buildScene() {
     fog: false,
   }));
   solarFarGlow.position.copy(sunMesh.position);
-  solarFarGlow.scale.set(560, 560, 1);
+  solarFarGlow.scale.set(720, 720, 1);
   scene.add(solarFarGlow);
 
   const solarFlare = new THREE.Sprite(new THREE.SpriteMaterial({
@@ -1251,7 +1324,7 @@ function buildScene() {
     fog: false,
   }));
   solarFlare.position.copy(sunMesh.position);
-  solarFlare.scale.set(430, 430, 1);
+  solarFlare.scale.set(560, 560, 1);
   scene.add(solarFlare);
 
   // PLANETS / PROJECTS
@@ -2024,6 +2097,7 @@ function buildScene() {
     });
 
     sunMesh.rotation.y += 0.00032;
+    if (sunMesh.material?.uniforms?.uTime) sunMesh.material.uniforms.uTime.value = elapsed;
     sunLight.intensity = 74000 + Math.sin(elapsed*0.22)*2600;
     solarCorona.material.opacity = 0.17 + Math.sin(elapsed*0.18)*0.012;
     solarOuterGlow.material.opacity = 0.072 + Math.sin(elapsed*0.12 + 0.6)*0.008;
