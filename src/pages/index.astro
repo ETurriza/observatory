@@ -91,6 +91,25 @@
     .p-tag{font-size:8px;padding:2px 6px;border-radius:4px;background:rgba(255,255,255,.045);border:0.5px solid rgba(255,255,255,.08);color:rgba(255,255,255,.34)}
     .p-btn{font-size:9px;padding:5px 12px;border-radius:5px;border:0.5px solid;background:transparent;cursor:pointer;font-family:'JetBrains Mono',monospace;transition:background .2s}
     .p-btn:hover{background:rgba(169,217,244,.08)}
+    .project-modal-backdrop{position:absolute;inset:0;z-index:35;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 50%,rgba(6,12,22,.38),rgba(0,0,0,.62));backdrop-filter:blur(4px);pointer-events:auto;animation:modalFade .22s ease}
+    @keyframes modalFade{from{opacity:0}to{opacity:1}}
+    .project-modal{position:relative;width:min(620px,calc(100vw - 44px));max-height:min(76vh,680px);overflow:hidden;background:linear-gradient(180deg,rgba(7,12,22,.96),rgba(1,4,10,.98));border:0.5px solid rgba(169,217,244,.28);border-radius:16px;box-shadow:0 28px 90px rgba(0,0,0,.66),0 0 42px rgba(151,203,232,.08),inset 0 1px rgba(255,255,255,.055);padding:24px 26px 22px;animation:modalPop .24s ease}
+    @keyframes modalPop{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+    .project-modal::before,.project-modal::after{content:"";position:absolute;width:24px;height:24px;border-color:rgba(151,203,232,.22);border-style:solid;pointer-events:none}
+    .project-modal::before{top:12px;left:12px;border-width:1px 0 0 1px}
+    .project-modal::after{right:12px;bottom:12px;border-width:0 1px 1px 0}
+    .modal-close{position:absolute;top:14px;right:16px;width:28px;height:28px;border:0.5px solid rgba(169,217,244,.2);border-radius:8px;background:rgba(169,217,244,.035);color:rgba(223,244,255,.5);font-family:'JetBrains Mono',monospace;font-size:15px;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+    .modal-close:hover{color:#fff;border-color:rgba(169,217,244,.44);background:rgba(169,217,244,.09)}
+    .modal-id{font-size:8px;color:rgba(151,203,232,.48);letter-spacing:.18em;margin-bottom:6px;text-transform:uppercase}
+    .modal-title{font-family:'Space Grotesk',sans-serif;font-size:26px;line-height:1.05;font-weight:500;color:#fff;letter-spacing:.02em;text-shadow:0 0 22px rgba(190,220,255,.2);padding-right:34px}
+    .modal-type{display:inline-block;margin-top:10px;margin-bottom:16px;font-size:8px;letter-spacing:.14em;text-transform:uppercase;padding:4px 9px;border-radius:6px;border:0.5px solid currentColor;background:rgba(255,255,255,.025)}
+    .modal-summary{font-size:12px;color:rgba(230,242,255,.68);line-height:1.85;letter-spacing:.025em;max-height:34vh;overflow-y:auto;padding-right:6px;white-space:normal}
+    .modal-summary::-webkit-scrollbar{width:4px}.modal-summary::-webkit-scrollbar-thumb{background:rgba(169,217,244,.22);border-radius:4px}
+    .modal-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
+    .modal-tag{font-size:8px;padding:3px 7px;border-radius:5px;background:rgba(255,255,255,.045);border:0.5px solid rgba(255,255,255,.085);color:rgba(223,244,255,.45);letter-spacing:.04em}
+    .modal-footer{display:flex;justify-content:flex-end;margin-top:18px}
+    .modal-btn{font-size:9px;padding:7px 13px;border-radius:6px;border:0.5px solid;background:rgba(169,217,244,.035);cursor:pointer;font-family:'JetBrains Mono',monospace;letter-spacing:.08em;transition:background .2s,box-shadow .2s}
+    .modal-btn:hover{background:rgba(169,217,244,.08);box-shadow:0 0 18px rgba(169,217,244,.08)}
     #loading{position:absolute;inset:0;background:#000;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;transition:opacity .6s}
     .load-bar-wrap{width:240px;height:2px;background:rgba(255,255,255,.08);border-radius:2px}
     .load-bar{height:100%;background:#dff4ff;border-radius:2px;width:0%;transition:width .3s;box-shadow:0 0 8px rgba(223,244,255,.55)}
@@ -1474,6 +1493,11 @@ function buildScene() {
     const key = e.key.toLowerCase();
     keys[key] = true;
 
+    if (key === 'escape' && activePopup) {
+      closePopup();
+      return;
+    }
+
     if (key === 'e') {
       const target = lookedAt || getLookTarget();
       if (target) {
@@ -1593,9 +1617,14 @@ function buildScene() {
     }, 2200);
   }
 
-  // ── POPUP ──────────────────────────────────────────────────────────────
+  // ── PROJECT MODAL ──────────────────────────────────────────────────────
   let activePopup = null;
-  function closePopup() { document.querySelector('.popup')?.remove(); activePopup = null; }
+
+  function closePopup() {
+    document.querySelector('.project-modal-backdrop')?.remove();
+    activePopup = null;
+  }
+
   function escapeHTML(value) {
     return String(value)
       .replaceAll('&', '&amp;')
@@ -1604,21 +1633,47 @@ function buildScene() {
       .replaceAll('"', '&quot;')
       .replaceAll("'", '&#039;');
   }
+
   function openPopup(obj) {
-    closePopup(); activePopup = obj; document.exitPointerLock();
-    const el = document.createElement('div');
-    el.className = 'popup';
-    el.style.cssText = 'top:50%;left:50%;transform:translate(-50%,-50%)';
-    el.innerHTML =
-      '<button class="p-close" id="pclose">X</button>' +
-      '<div class="p-id">' + obj.id + '</div>' +
-      '<div class="p-name">' + obj.name + '</div>' +
-      '<span class="p-type" style="color:'+obj.colorHex+';background:'+obj.colorHex+'18;border-color:'+obj.colorHex+'40">'+obj.type+'</span>' +
-      '<div class="p-desc">' + escapeHTML(obj.desc) + '</div>' +
-      '<div class="p-tags">' + obj.tags.map(t => '<span class="p-tag">'+t+'</span>').join('') + '</div>' +
-      (!obj.noLink ? '<button class="p-btn" style="color:'+obj.colorHex+';border-color:'+obj.colorHex+'50">ver en GitHub</button>' : '');
-    document.getElementById('container').appendChild(el);
-    document.getElementById('pclose').addEventListener('click', closePopup);
+    closePopup();
+    activePopup = obj;
+    document.exitPointerLock?.();
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'project-modal-backdrop';
+
+    const safeColor = obj.colorHex || '#dff4ff';
+    const tagsHTML = obj.tags
+      .map(tag => `<span class="modal-tag">${escapeHTML(tag)}</span>`)
+      .join('');
+
+    backdrop.innerHTML = `
+      <section class="project-modal" role="dialog" aria-modal="true" aria-label="${escapeHTML(obj.name)}">
+        <button class="modal-close" type="button" aria-label="Cerrar">×</button>
+        <div class="modal-id">${escapeHTML(obj.id)} · ${escapeHTML(obj.type)}</div>
+        <div class="modal-title">${escapeHTML(obj.name)}</div>
+        <div class="modal-type" style="color:${safeColor};border-color:${safeColor}">${escapeHTML(obj.type)}</div>
+        <div class="modal-summary">${escapeHTML(obj.desc)}</div>
+        <div class="modal-tags">${tagsHTML}</div>
+        <div class="modal-footer">
+          <button class="modal-btn" style="color:${safeColor};border-color:${safeColor}" type="button">
+            VER EN GITHUB
+          </button>
+        </div>
+      </section>
+    `;
+
+    backdrop.addEventListener('click', event => {
+      if (event.target === backdrop) closePopup();
+    });
+
+    backdrop.querySelector('.modal-close')?.addEventListener('click', closePopup);
+
+    backdrop.querySelector('.modal-btn')?.addEventListener('click', () => {
+      if (!obj.noLink && obj.url) window.open(obj.url, '_blank', 'noopener,noreferrer');
+    });
+
+    document.getElementById('container').appendChild(backdrop);
   }
 
   // ── MOVEMENT ───────────────────────────────────────────────────────────
