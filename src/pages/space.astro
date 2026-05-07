@@ -119,7 +119,7 @@
       <div class="hl">POSICION</div>
       <div class="hv" id="hpos" style="font-size:9px">X:0 Y:0 Z:0</div>
       <div class="hl" style="margin-top:4px">OBJETOS DESCUBIERTOS</div>
-      <div class="hv" id="hobj" style="font-size:9px">0 / 6</div>
+      <div class="hv" id="hobj" style="font-size:9px">0 / 7</div>
     </div>
     <div class="hbr">
       <div class="hl">ORIGEN - DESTINO</div>
@@ -1268,6 +1268,15 @@ function buildScene() {
       desc:'Implementacion del algoritmo DBSCAN desde cero en C++, paralelizado con OpenMP. Logra un speedup de 2.0x sobre la version serial procesando mas de 900,000 registros del dataset de crimenes del LAPD. Incluye analisis de escalabilidad y version distribuida con MPI.', noLink:true
     },
     {
+      id:'NGC-007', name:'Bases de Datos', type:'archivo relacional', colorHex:'#7fb0ff',
+      pos: new THREE.Vector3(610, 42, -430), radius:12,
+      tex: T.earth, atmoColor: new THREE.Color(0x7fb0ff),
+      hasClouds: true, hasSpecular: true, roughness:0.58, clearcoat:0.18, cloudOpacity:0.12, bumpScale:0.025, terminatorStrength:0.28,
+      tags:['SQL','Normalizacion','Data Cleaning','LA Crime Data'],
+      desc:'Proyecto final de Bases de Datos en el ITAM, desarrollado en Otono 2024. Se diseno un sistema de gestion de datos para almacenar, administrar y analizar informacion del dataset de crimenes de Los Angeles. Incluye limpieza de datos, normalizacion, creacion de tablas e insercion mediante SQL, ademas de consultas estadisticas sobre horarios, zonas y tipos de crimen.',
+      noLink:false, url:'https://github.com/Diego-FRM/Proyecto-Bases-de-Datos', buttonLabel:'VER EN GITHUB'
+    },
+    {
       id:'NGC-005', name:'1er lugar LIDERA', type:'mundo volcanico', colorHex:'#e8b482',
       pos: new THREE.Vector3(735, 32, -20), radius:13,
       tex: T.venus, atmoColor: new THREE.Color(0xe1b27f),
@@ -1575,10 +1584,10 @@ function buildScene() {
 
       if (!discovered.has(lookedAt.id)) {
         discovered.add(lookedAt.id);
-        document.getElementById('hobj').textContent = discovered.size + ' / 6';
+        document.getElementById('hobj').textContent = discovered.size + ' / 7';
         showDiscoveryFeedback(lookedAt);
       } else {
-        document.getElementById('hobj').textContent = discovered.size + ' / 6';
+        document.getElementById('hobj').textContent = discovered.size + ' / 7';
       }
     } else {
       tgt.style.opacity = '0';
@@ -1763,7 +1772,9 @@ function buildScene() {
     });
 
     if (!obj.noLink) {
+      if (!obj.noLink) {
       footer.appendChild(githubBtn);
+    }
     }
 
     modal.appendChild(close);
